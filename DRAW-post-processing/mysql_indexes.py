@@ -12,6 +12,12 @@ def data_entries_raw(index_type, action):
                     cursor.execute("CREATE INDEX data_entries_raw_annotation_index ON data_entries_raw (annotation_id);")
                 case 'delete':
                     cursor.execute("DROP INDEX data_entries_raw_annotation_index ON data_entries_raw;")
+        case 'observation':
+            match action:
+                case 'create':
+                    cursor.execute("CREATE INDEX data_entries_raw_observation_index ON data_entries_raw (observation_date);")
+                case 'delete':
+                    cursor.execute("DROP INDEX data_entries_raw_observation_index ON data_entries_raw;")
 
         case 'field_date':
             match action:

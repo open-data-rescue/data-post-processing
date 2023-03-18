@@ -18,34 +18,51 @@ def reference_previous_values(entry, option):
             return -1, None
         cursor.execute(command)
         list_entries = cursor.fetchall()
-        list_values = [item[1] for item in list_entries]
-        if step == 2 and len(list_values) == 0:
-            return -1, None
-
-        start_index = 0
-        if (step == 1) or (step == 2 and counter == 0):
-            for i in list_entries:
-                if i[0] == entry[0]:
-                    break
-                start_index += 1
-        elif step == 2 and counter > 0:
-            start_index = len(list_values)
-
+        if len(list_entries) == 0:
+            return -1,None
         try:
-            for i in range(start_index - 1, -1, -1):
-                try:
-                    if (list_values[i][0:2] in config.possible_lead_digits_pressure) and (config.possible_pressure_formats(list_values[i], True)):
-                        match option:
-                            case 'leading_digits':
-                                ref_info = list_entries[i]
-                                return list_values[i][0:2], [ref_info[0], ref_info[1], ref_info[9]]  # ref. value , information about ref. value
-                            case 'whole_value':
-                                return list_values[i]
-                except TypeError:
-                    return None, None
+            for list_entry in list_entries:
+                list_value=list_entry[1]
+                if (list_value[0:2] in config.possible_lead_digits_pressure) and (config.possible_pressure_formats(list_value, True)):
+                    match option:
+                        case 'leading_digits':
+                            ref_info = list_entry
+                            return list_value[0:2], [ref_info[0], ref_info[1], ref_info[9]]  # ref. value , information about ref. value
+                        case 'whole_value':
+                            return list_value
+        except TypeError:
             return None, None
-        except ValueError:
-            return None, None
+        return None, None
+            # except ValueError:
+            #     return None, None
+        # list_values = [item[1] for item in list_entries]
+        # if step == 2 and len(list_values) == 0:
+        #     return -1, None
+
+        # start_index = 0
+        # if (step == 1) or (step == 2 and counter == 0):
+        #     for i in list_entries:
+        #         if i[0] == entry[0]:
+        #             break
+        #         start_index += 1
+        # elif step == 2 and counter > 0:
+        #     start_index = len(list_values)
+
+        # try:
+        #     for i in range(start_index - 1, -1, -1):
+        #         try:
+        #             if (list_values[i][0:2] in config.possible_lead_digits_pressure) and (config.possible_pressure_formats(list_values[i], True)):
+        #                 match option:
+        #                     case 'leading_digits':
+        #                         ref_info = list_entries[i]
+        #                         return list_values[i][0:2], [ref_info[0], ref_info[1], ref_info[9]]  # ref. value , information about ref. value
+        #                     case 'whole_value':
+        #                         return list_values[i]
+        #         except TypeError:
+        #             return None, None
+        #     return None, None
+        # except ValueError:
+        #     return None, None
 
     result, info = modular_code_block(entry, sql.check_1_command(entry), 1)
     if result is not None:
@@ -53,18 +70,14 @@ def reference_previous_values(entry, option):
             return None, None
         return result, info
     else:
-        counter = 0
-        while True:
-            result, info = modular_code_block(entry, sql.check_2_command(entry, counter), 2)
-            if result is not None:
-                if result == -1:
-                    return None, None
-                return result, info
-            else:
-                counter += 1
-                if counter > 25:
-                    print('verify if loop is infinite!')
-                    return None, None
+    
+        result, info = modular_code_block(entry, sql.check_2_command(entry, 0), 2)
+        if result is not None:
+            if result == -1:
+                return None, None
+            return result, info
+        else:
+            return None, None
 
 
 # remove any spaces present in the data entry

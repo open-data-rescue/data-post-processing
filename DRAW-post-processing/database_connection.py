@@ -2,12 +2,21 @@ import mysql.connector
 import sql_commands
 import os
 
+corrected_table=[]
+final_corrected_table=[]
+phase_1_errors=[]
+phase_2_errors=[]
+duplicateless=[]
+
 # connection to copy of database on local machine
 conn = mysql.connector.connect(
     #####   FOLLOWING 3 VARIABLES TO BE CONFIGURED AS NECESSARY FOR LOCAL MACHINE:   #####
     user=os.environ.get('DRAW_local_db_user'),
     password=os.environ.get('DRAW_local_db_pass'),
-    database='climatedatarescueprocessed',
+    #user='vicky',
+    #password='password',
+    database='climate_test',
+    #database='climatedatarescue',
     host='localhost'
 )
 

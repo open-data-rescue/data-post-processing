@@ -6,7 +6,11 @@ import sql_commands as sql
 
 db_conn = db.conn
 cursor = db.cursor
-
+corrected_table=db.corrected_table
+final_corrected_table=db.final_corrected_table
+phase_1_errors=db.phase_1_errors
+phase_2_errors=db.phase_2_errors
+duplicateless=db.duplicateless
 
 # adds 'post_process_id' column to fields table, necessary before creating raw data table for post-processing
 def add_ppid_column_fields_table():
@@ -30,10 +34,12 @@ def update_fields_ppid(post_process_id, field_id_tuple):
 
 # command to create composite raw data table from data entries, fields and annotations tables; creating this table is necessary as it enables the
 # addition of indexes (which speeds up code considerably during runtime) and standardizes organization of data in DRAW post-processing
-def create_raw_data_table():
+def create_raw_data_table(continue_flag):
     cursor.execute("DROP TABLE IF EXISTS data_entries_raw;")
-    cursor.execute(sql.composite_raw_data_entries)
-
+    if continue_flag == True:
+        cursor.execute(sql.composite_raw_data_entries_continue)
+    else:
+        cursor.execute(sql.composite_raw_data_entries)
 
 # create 'data_entries_corrected' table to store values after cleaned in phase 1
 def create_corrected_data_table():
@@ -57,34 +63,52 @@ def create_duplicateless_table():
 
 
 # creates 'data_entries_corrected_final' table for post-phase 2 processed data
-def create_final_corrected_table():
-    cursor.execute("DROP TABLE IF EXISTS data_entries_corrected_final;")
-    create_table = "CREATE TABLE data_entries_corrected_final AS SELECT * FROM data_entries_corrected_duplicateless LIMIT 0;"
-    cursor.execute(create_table)
+def create_final_corrected_table(continue_flag):
+    if continue_flag is False:
+        cursor.execute("DROP TABLE IF EXISTS data_entries_corrected_final;")
+        create_table = "CREATE TABLE data_entries_corrected_final AS SELECT * FROM data_entries_corrected_duplicateless LIMIT 0;"
+        cursor.execute(create_table)
 
 
 # creates 'data_entries_phase_{}_errors' table for error and edit documentation
-def create_error_edit_table(phase):
-    cursor.execute("DROP TABLE IF EXISTS data_entries_phase_{}_errors;".format(phase))
-    cursor.execute(sql.create_error_edit_table(phase))
+def create_error_edit_table(phase,continue_flag):
+    if continue_flag is False:
+        cursor.execute("DROP TABLE IF EXISTS data_entries_phase_{}_errors;".format(phase))
+        cursor.execute(sql.create_error_edit_table(phase))
 
 
 # adds entry to "data_entries_corrected" table
 def add_to_corrected_table(entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged):
+    global corrected_table
+    corrected_table.append([entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged])
+    if len(corrected_table)>50000:
+        populate_corrected_table()
+        corrected_table=[]
+
+def populate_corrected_table():
     sql_command = "INSERT INTO data_entries_corrected " \
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
-                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    cursor.execute(sql_command, (entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged))
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);" 
+    cursor.executemany(sql_command, corrected_table)
     db_conn.commit()
+
 
 
 # adds entry to "data_entries_corrected_final" table (after phase 2 checking)
 def add_to_final_corrected_table(entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged):
+    global final_corrected_table
+    final_corrected_table.append([entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged])
+    if len(final_corrected_table)>50000:
+        populate_final_corrected_table()
+        final_corrected_table=[]
+
+def populate_final_corrected_table():
     sql_command = "INSERT INTO data_entries_corrected_final " \
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
-                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    cursor.execute(sql_command, (entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged))
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);" 
+    cursor.executemany(sql_command, final_corrected_table)
     db_conn.commit()
+
 
 
 # add flag or edit made to particular value to "data_entries_phase_{}_errors" table (depending on chosen input parameter, can be for phase 1 or 2)
@@ -93,23 +117,38 @@ def add_error_edit_code(phase, error_code, original_value, corrected_value, entr
     user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date = [None for i in range(8)]
     if phase == 1:
         user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date = entry_list[2:]  # deal with 10 rows
+        phase_1_errors.append([entry_id, original_value, corrected_value, error_code, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, add_info])
     elif phase == 2:
         user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date = entry_list[2:len(entry_list) - 1]  # deal with 11 rows
+        phase_2_errors.append([entry_id, original_value, corrected_value, error_code, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, add_info])
+
+
+def populate_error_edit_code(phase):
     sql_command = "INSERT INTO data_entries_phase_{}_errors " \
                   "(id, ORIGINAL_VALUE, CORRECTED_VALUE, error_code, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, additional_info) " \
                   "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);".format(phase)
-    cursor.execute(sql_command, (entry_id, original_value, corrected_value, error_code, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, add_info))
-    db_conn.commit()
-
-
+    if phase==1:        
+        cursor.executemany(sql_command, phase_1_errors)
+    elif phase==2:
+        cursor.executemany(sql_command, phase_2_errors)
+    db_conn.commit()   
+    
+    
+    
 # add reconciled observation entry to duplicateless table (after phase 1)
 def add_to_duplicateless_table(entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged):
+    global duplicateless
+    duplicateless.append([entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged])
+    if len(duplicateless)>50000:
+        populate_duplicateless_table()
+        duplicateless=[]
+
+def populate_duplicateless_table():
     sql_command = "INSERT INTO data_entries_corrected_duplicateless " \
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
                   "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    cursor.execute(sql_command, (entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged))
-    db_conn.commit()
-
+    cursor.executemany(sql_command, duplicateless)
+    db_conn.commit()   
 
 # updates duplicateless table - used to update MySQL table during observation reconciliation, before continuing with phase 2
 def update_duplicateless_table(value, entry_id):

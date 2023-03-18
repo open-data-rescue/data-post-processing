@@ -3,6 +3,7 @@
 import id1p2_methods as methods
 import config
 import tables
+import sys
 
 
 def phase_2(entry, lead_digs_added):
@@ -31,4 +32,4 @@ def phase_2(entry, lead_digs_added):
         elif diff_equation_transcribed < config.pressure_diff_threshold:
             pass  # TODO : for when difference is not great, but can try to pick out possible smaller errors
       except:
-          print(value,methods.equation_resultant_value(entry))
+          print(value,methods.equation_resultant_value(entry),file=sys.stderr)

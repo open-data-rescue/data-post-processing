@@ -13,6 +13,7 @@ def remove_duplicates():
 
     counter = 0
     checked_entries = {}
+    print("Reconciliation:")
     for entry in data_entries:
         if entry[9] is not None and entry[0] not in checked_entries.keys():
             cursor.execute("SELECT * FROM data_entries_corrected "
@@ -48,4 +49,8 @@ def remove_duplicates():
         elif entry[9] is None and entry not in checked_entries:
             tables.add_to_duplicateless_table(*entry)
         counter += 1
-        print('Reconciliation:', counter)
+        if (counter % 1000) == 0:
+            print('.', end="")
+        if (counter % 50000) == 0:
+            print("")
+    tables.populate_duplicateless_table()
