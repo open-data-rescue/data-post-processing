@@ -13,10 +13,8 @@ conn = mysql.connector.connect(
     #####   FOLLOWING 3 VARIABLES TO BE CONFIGURED AS NECESSARY FOR LOCAL MACHINE:   #####
     user=os.environ.get('DRAW_local_db_user'),
     password=os.environ.get('DRAW_local_db_pass'),
-    #user='vicky',
-    #password='password',
-    database='climate_test',
-    #database='climatedatarescue',
+    #database='climate_test',
+    database='climatedatarescue',
     host='localhost'
 )
 
@@ -34,6 +32,12 @@ def raw_data():
 # returning phase 1-corrected, duplicateless data entries => for phase 2
 def phase_1_data():
     sql_command = sql_commands.phase_1_data_sql
+    cursor.execute(sql_command)
+    result = cursor.fetchall()
+    return result
+
+def phase_1_data_test():
+    sql_command = sql_commands.phase_1_data_test_sql
     cursor.execute(sql_command)
     result = cursor.fetchall()
     return result

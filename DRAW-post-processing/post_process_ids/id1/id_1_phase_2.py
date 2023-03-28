@@ -1,6 +1,6 @@
 # post-processing range/consistency check algorithm for post_process_id = 1 (phase 2)
 
-import id1p2_methods as methods
+import phase2_methods as methods
 import config
 import tables
 import sys

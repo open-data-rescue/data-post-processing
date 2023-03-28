@@ -1,6 +1,6 @@
 # post-processing format check algorithm for post_process_id = 1
 
-import id1p1_methods as methods
+import phase1_methods as methods
 import tables
 
 

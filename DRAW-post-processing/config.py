@@ -1,18 +1,18 @@
 # File for configuring variables/attributes that are addressed in the workflow
 
-import id1p1_methods as methods
+import phase1_methods as methods
 
 
 # assigning post-process ID's to field ID's
 # assign a TUPLE to multiple field_id's with one PPID; otherwise assign integer for single field_id
 ppid_to_field_id = {1: (4, 6, 7, 8, 67, 69),
                     2: 14,
-                    3: (9, 10, 11, 12)
+                    3: (9, 10, 11, 12,36,37,38,39,63,64,68,76,77,78,79)
                     }
 
 
 # unexpected characters in a data entry (when not surrounded on either side by digits)  TODO : determine if any alterations necessary for non-pressure values
-unexpected_characters = {'?', '.', '*', '&', '#', '^', '$', '(', ')', '[', ']', '{', '}', '"', '/', '@', "\\"}
+unexpected_characters = {'?', '.', '*', '&', '#', '^', '$', '(', ')', '[', ']', '{', '}', '"', '/', '@', "\\", ';'}
 
 
 # characters that could potentially have replaced decimal point in a numerical data entry
@@ -41,6 +41,21 @@ def possible_pressure_formats(value, for_leading_digits):
 # outlier bounds for pressure values
 pressure_min = 27.000
 pressure_max = 33.000
+
+# outlier bounds for temperature values
+temperature_min = -100.0
+temperature_max= 180.0
+
+# temperature difference allowed
+temperature_difference_allowed_obs_corr=2
+
+# temperature corresponding fields observed - corrected
+temperature_corr_observed_fields=[[9,10],[11,12],[36,37],[38,39],[76,77],[78,79]]
+temperature_min_max_fields=[[38,36],[39,37],[76,78],[77,79]]
+
+# temperature fields to detect stat outliers
+temperature_stat_outliers=[9,10] 
+
 
 # threshold value for which fluctuation between previous timestamp and current timestamp (for same field id) requires further investigation (phase 2)
 scalar_fluctuation_thresholds = {'01': 0.00, '02': 0.00, '03': 0.00, '04': 0.00, '05': 0.00, '06': 0.00,  # TODO : fill w/ pressure_fluctuation_stats results

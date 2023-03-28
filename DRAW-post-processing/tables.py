@@ -127,11 +127,13 @@ def populate_error_edit_code(phase):
     sql_command = "INSERT INTO data_entries_phase_{}_errors " \
                   "(id, ORIGINAL_VALUE, CORRECTED_VALUE, error_code, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, additional_info) " \
                   "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);".format(phase)
+
     if phase==1:        
         cursor.executemany(sql_command, phase_1_errors)
     elif phase==2:
         cursor.executemany(sql_command, phase_2_errors)
     db_conn.commit()   
+
     
     
     

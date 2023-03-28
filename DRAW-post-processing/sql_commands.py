@@ -66,6 +66,7 @@ def create_error_edit_table(phase):
 raw_data_sql = "SELECT * FROM data_entries_raw;"
 
 phase_1_data_sql = "SELECT * FROM data_entries_corrected_duplicateless;"
+phase_1_data_test_sql = "SELECT * FROM data_entries_corrected_duplicateless_test;"
 
 
 # MySQL commands used during post-processing phases:

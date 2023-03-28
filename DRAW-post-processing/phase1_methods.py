@@ -4,6 +4,7 @@ import config
 import sql_commands as sql
 import database_connection as db
 import tables
+import re
 
 cursor = db.cursor
 
@@ -33,36 +34,6 @@ def reference_previous_values(entry, option):
         except TypeError:
             return None, None
         return None, None
-            # except ValueError:
-            #     return None, None
-        # list_values = [item[1] for item in list_entries]
-        # if step == 2 and len(list_values) == 0:
-        #     return -1, None
-
-        # start_index = 0
-        # if (step == 1) or (step == 2 and counter == 0):
-        #     for i in list_entries:
-        #         if i[0] == entry[0]:
-        #             break
-        #         start_index += 1
-        # elif step == 2 and counter > 0:
-        #     start_index = len(list_values)
-
-        # try:
-        #     for i in range(start_index - 1, -1, -1):
-        #         try:
-        #             if (list_values[i][0:2] in config.possible_lead_digits_pressure) and (config.possible_pressure_formats(list_values[i], True)):
-        #                 match option:
-        #                     case 'leading_digits':
-        #                         ref_info = list_entries[i]
-        #                         return list_values[i][0:2], [ref_info[0], ref_info[1], ref_info[9]]  # ref. value , information about ref. value
-        #                     case 'whole_value':
-        #                         return list_values[i]
-        #         except TypeError:
-        #             return None, None
-        #     return None, None
-        # except ValueError:
-        #     return None, None
 
     result, info = modular_code_block(entry, sql.check_1_command(entry), 1)
     if result is not None:
@@ -79,7 +50,16 @@ def reference_previous_values(entry, option):
         else:
             return None, None
 
-
+# extract decimal from a string containing text and decimal
+def extract_decimal(value, entry):
+    original_value=value
+    value=re.search(r'-?\d+.?\d*', original_value) 
+    if value==None:
+        value=''
+    tables.add_error_edit_code(1, '301', original_value, value, entry)
+    return value
+    
+    
 # remove any spaces present in the data entry
 def remove_spaces(value, entry):
     if ' ' in value:
@@ -132,6 +112,8 @@ def remove_unexpected_characters(value, entry):
         if (len(value) >= 9 and ',' in value) or (value[0] == '.' and isinstance(int(value[1:]), int)) or (value[len(value) - 1] == '.' and isinstance(int(value[:len(value) - 1]), int)):
             return value
     except ValueError:
+        pass
+    except IndexError:
         pass
     original_value = value
     value = list(value)
@@ -220,6 +202,17 @@ def desired_pressure_format(value):
         return False
     return False
 
+# Checking to see if temperature value is a float
+def desired_temperature_format(value):
+    try:
+        float(value)
+#        if len(value) == 6 and float_decimal_index(value) == 2:
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    return False
 
 # returns True if value is of form XX XXX where the space is one of ( '/'  ';'  ','  '-' )
 def pressure_decimal_alternate(value):
