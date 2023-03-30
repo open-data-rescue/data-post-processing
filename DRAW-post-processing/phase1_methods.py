@@ -56,7 +56,7 @@ def extract_decimal(value, entry):
     value=re.search(r'-?\d+.?\d*', original_value) 
     if value==None:
         value=''
-    tables.add_error_edit_code(1, '301', original_value, value, entry)
+    tables.add_error_edit_code(1, '301', original_value, str(value), entry)
     return value
     
     

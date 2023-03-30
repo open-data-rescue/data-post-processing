@@ -160,6 +160,13 @@ def update_duplicateless_table(value, entry_id):
     cursor.execute(sql_command, (value, entry_id))
     db_conn.commit()
 
+# get annotations that have been inserted in error edit code table for a given ppid
+def get_error_code_annotations(phase, ppid):
+    sql_command= "select annotation_id from data_entries_phase_{}_errors ".format(phase)
+    sql_command=sql_command + "where post_process_id='"+ppid+"'"
+    cursor.execute(sql_command)
+    return cursor.fetchall()
+
 
 # deletes MySQL table at the very end of post-processing
 def delete_table(name):

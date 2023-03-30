@@ -17,7 +17,7 @@ import post_process_ids.id3.id_3_outliers as id3outliers
 
 import phase2_methods as id1p2_methods
 import time
-import argparse
+#import argparse
 
 def logPerf(message):
     global tic

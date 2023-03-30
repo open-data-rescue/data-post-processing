@@ -13,8 +13,8 @@ conn = mysql.connector.connect(
     #####   FOLLOWING 3 VARIABLES TO BE CONFIGURED AS NECESSARY FOR LOCAL MACHINE:   #####
     user=os.environ.get('DRAW_local_db_user'),
     password=os.environ.get('DRAW_local_db_pass'),
-    #database='climate_test',
-    database='climatedatarescue',
+    database='climate_test',
+    #database='climatedatarescue',
     host='localhost'
 )
 
