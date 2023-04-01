@@ -8,6 +8,7 @@ db_conn = db.conn
 cursor = db.cursor
 corrected_table=db.corrected_table
 final_corrected_table=db.final_corrected_table
+final_corrected_table_iso=db.final_corrected_table_iso
 phase_1_errors=db.phase_1_errors
 phase_2_errors=db.phase_2_errors
 duplicateless=db.duplicateless
@@ -69,6 +70,12 @@ def create_final_corrected_table(continue_flag):
         create_table = "CREATE TABLE data_entries_corrected_final AS SELECT * FROM data_entries_corrected_duplicateless LIMIT 0;"
         cursor.execute(create_table)
 
+# creates 'data_entries_corrected_final_iso' table for post-phase 2 processed data iso transformation
+def create_final_corrected_table_iso(continue_flag):
+    if continue_flag is False:
+        cursor.execute("DROP TABLE IF EXISTS data_entries_corrected_final_iso;")
+        create_table = "CREATE TABLE data_entries_corrected_final_iso AS SELECT * FROM data_entries_corrected_final LIMIT 0;"
+        cursor.execute(create_table)
 
 # creates 'data_entries_phase_{}_errors' table for error and edit documentation
 def create_error_edit_table(phase,continue_flag):
@@ -92,7 +99,20 @@ def populate_corrected_table():
     cursor.executemany(sql_command, corrected_table)
     db_conn.commit()
 
+# adds entry to "data_entries_corrected" table
+def add_to_final_corrected_table_iso(entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged):
+    global final_corrected_table_iso
+    final_corrected_table_iso.append([entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged])
+    if len(final_corrected_table_iso)>50000:
+        populate_final_corrected_table_iso()
+        final_corrected_table_iso=[]
 
+def populate_final_corrected_table_iso():
+    sql_command = "INSERT INTO data_entries_corrected_final_iso " \
+                  "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);" 
+    cursor.executemany(sql_command, final_corrected_table_iso)
+    db_conn.commit()
 
 # adds entry to "data_entries_corrected_final" table (after phase 2 checking)
 def add_to_final_corrected_table(entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged):

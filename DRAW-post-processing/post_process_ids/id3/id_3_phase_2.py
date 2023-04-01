@@ -69,47 +69,53 @@ def flag_outliers (df, field_id):
 
     df_proc=df[df.field_id==field_id].sort_values(by=['observation_date'])
     df_proc.reset_index(inplace=True)
-    x=df_proc.index
-    y=df_proc.value
-    if y.size>0:
-            #param, param_cov = curve_fit(test,x,y)
-            ans=y.rolling(5).mean()   
-            delta=(y-ans).abs()
-            standard_deviation=delta.std()
-            outliers=df_proc[df_proc.index.isin(delta[delta.gt(5*standard_deviation)].index)]
-
-            # Get list of months for outliers
-            for outlier_year_month in (outliers.observation_date.dt.to_period('M').unique()):
-                df_mon=df_proc[df_proc.observation_date.dt.to_period('M')==outlier_year_month]
-                outliers_mon=outliers[outliers.observation_date.dt.to_period('M')==outlier_year_month]
-                x=df_mon.observation_date
-                y=df_mon.value
-                ans_mon=ans[ans.index.isin(x.index)]
-                plt.plot(x, y, '.', color ='black', label ="data")
-                plt.plot(x, ans_mon, '--', color ='blue', label ="rolling mean")
-                plt.plot(outliers_mon.observation_date, outliers_mon.value,'o', color='red', label="Outliers")
-                plt.title("Field: " +str(field_id)+" - "+str(outlier_year_month))
-                plt.legend()
-                plt.show()   
-
-
-
-
-#     for m in range(1,12):
-#         #take data for january
-#         df_mon=df_proc[df_proc.observation_date.dt.month==m]
-#         df_mon.reset_index(inplace=True)
-#         x=df_mon.index
-#         y=df_mon.value
-#         if y.size>0:
-#             param, param_cov = curve_fit(test,x,y)
-#             ans=test(x,param[0],param[1],param[2],param[3],param[4],param[5])
-# #            ans = (param[0]*x*x*x*x*x+param[1]*x*x*x*x+param[2]*x*x*x+param[3]*x*x+param[4]*x+param[5])
     
-#             plt.plot(x, y, 'o', color ='red', label ="data")
-#             plt.plot(x, ans, '--', color ='blue', label ="optimized data")
-#             plt.legend()
-#             plt.show()
+    #determine list of series that are eligible for validation based on rule: needs less than 5 days before or after with no data
+    obs_date=None
+    list_partial=[]
+    for index,row in df_proc.iterrows():
+        if (obs_date==None or (row['observation_date']-obs_date).days<5) and len(list_partial)<100:
+            list_partial.append(row)
+            obs_date=row['observation_date']
+        else:
+            df_partial=pd.DataFrame(list_partial)
+            
+            x=df_partial.observation_date
+            y=df_partial.value
+            if y.size>6:
+                #param, param_cov = curve_fit(test,x,y)
+                ans=y.rolling(5, center=True).mean()   
+                delta=(y-ans).abs()
+                standard_deviation=delta.std()
+                outliers=df_proc[df_proc.index.isin(delta[delta.gt(5*standard_deviation)].index)]
+                if outliers.size >0:
+                    plt.plot(x, y, '.', color ='black', label ="data")
+                    plt.plot(x, ans, '--', color ='blue', label ="rolling mean")
+                    plt.plot(outliers.observation_date, outliers.value,'o', color='red', label="Outliers")
+                    plt.title("Field: " +str(field_id))
+                    plt.legend()
+                    plt.show()
+                    # do something with the outliers
+            obs_date=row['observation_date']
+            list_partial=[]
+            list_partial.append(row)
+
+            
+            
+            # # Get list of months for outliers
+            # for outlier_year_month in (outliers.observation_date.dt.to_period('M').unique()):
+            #     df_mon=df_proc[df_proc.observation_date.dt.to_period('M')==outlier_year_month]
+            #     outliers_mon=outliers[outliers.observation_date.dt.to_period('M')==outlier_year_month]
+            #     x=df_mon.observation_date
+            #     y=df_mon.value
+            #     ans_mon=ans[ans.index.isin(x.index)]
+            #     plt.plot(x, y, '.', color ='black', label ="data")
+            #     plt.plot(x, ans_mon, '--', color ='blue', label ="rolling mean")
+            #     plt.plot(outliers_mon.observation_date, outliers_mon.value,'o', color='red', label="Outliers")
+            #     plt.title("Field: " +str(field_id)+" - "+str(outlier_year_month))
+            #     plt.legend()
+            #     plt.show()   
+
 
 
 

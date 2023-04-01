@@ -9,8 +9,12 @@ import setup_raw_data_table as setup
 # Importing post_process_id = 1:
 import post_process_ids.id1.id_1_phase_1 as id1p1
 import post_process_ids.id1.id_1_phase_2 as id1p2
+import post_process_ids.id1.id_1_phase_3 as id1p3
+
 import post_process_ids.id3.id_3_phase_1 as id3p1
 import post_process_ids.id3.id_3_phase_2 as id3p2
+import post_process_ids.id3.id_3_phase_3 as id3p3
+
 
 import post_process_ids.id1.id_1_outliers as id1outliers
 import post_process_ids.id3.id_3_outliers as id3outliers
@@ -44,6 +48,11 @@ def filter_id(pp_id, entry, phase):
                 id1p2.phase_2(entry, False)
         else:
             tables.add_to_final_corrected_table(*entry)
+    if phase ==3:
+        if pp_id==1:
+            id1p3.phase_3(entry)
+        elif pp_id==3:
+            id3p3.phase_3(entry)
  
     elif phase== 'outlier_removal':
         if pp_id ==1:
@@ -151,6 +160,23 @@ tables.populate_final_corrected_table()
 tables.populate_error_edit_code(2)    
 
 logPerf("Phase 2 complete")
+
+#####################       EXECUTE PHASE 3 (ISO TRANSLATION)       #########################
+print ("Phase 3:")
+tables.create_final_corrected_table_iso(continue_flag)
+entries=db.phase_2_data()
+for row in entries:
+    post_process_id = row[8]
+    filter_id(post_process_id, row, 3)
+    counter += 1
+    if (counter % 1000) == 0:
+        print('.', end="")
+    if (counter % 50000) == 0:
+        print("")
+tables.populate_final_corrected_table_iso()
+
+logPerf("Completed phase 3")    
+
 
 #####################       DELETE ALL DISPENSABLE TABLES (KEEP FINAL + ERRORS/EDITS TABLES)       ############################
 tables.delete_table('data_entries_raw')
