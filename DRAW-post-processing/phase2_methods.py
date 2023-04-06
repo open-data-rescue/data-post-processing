@@ -228,12 +228,12 @@ def check_lead_digs_with_equation(diff_value, return_list, lead_digs_added_bool)
             case 'is_left':
                 if fluctuation_exceeds_normal(return_list):
                     return_list[1] = str(float(value) + 1.000)
-                    tables.add_error_edit_code(2, '122', value, return_list[1], return_list)
+                    tables.add_error_edit_code(2, '103', value, return_list[1], return_list)
                     id_1_phase_2.phase_2(return_list, lead_digs_added_bool)
             case 'is_right':
                 if fluctuation_exceeds_normal(return_list):
                     return_list[1] = str(float(value) - 1.000)
-                    tables.add_error_edit_code(2, '122', value, return_list[1], return_list)
+                    tables.add_error_edit_code(2, '103', value, return_list[1], return_list)
                     id_1_phase_2.phase_2(return_list, lead_digs_added_bool)
             case False:
                 pass  # TODO : PASS THROUGH check_other_transcription_errors()
@@ -246,5 +246,5 @@ def check_lead_digs_with_equation(diff_value, return_list, lead_digs_added_bool)
 # returns hash set of id's corresponding to values whose leading digits have been added artificially in phase 1
 def pressure_artificial_lead_digs_list():
     cursor.execute("SELECT * FROM data_entries_phase_1_errors "
-                   "WHERE error_code IN (110,115);")
+                   "WHERE error_code IN (010,101);")
     return set([item[0] for item in cursor.fetchall()])

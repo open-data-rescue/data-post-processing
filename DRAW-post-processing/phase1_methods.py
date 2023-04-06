@@ -31,6 +31,7 @@ def reference_previous_values(entry, option):
                             return list_value[0:2], [ref_info[0], ref_info[1], ref_info[9]]  # ref. value , information about ref. value
                         case 'whole_value':
                             return list_value
+                    tables.add_error_edit_code(1, '010', original_value, str(value), entry)
         except TypeError:
             return None, None
         return None, None
@@ -56,7 +57,7 @@ def extract_decimal(value, entry):
     value=re.search(r'-?\d+.?\d*', original_value) 
     if value==None:
         value=''
-    tables.add_error_edit_code(1, '301', original_value, str(value), entry)
+    tables.add_error_edit_code(1, '018', original_value, str(value), entry)
     return value
     
     
@@ -68,7 +69,7 @@ def remove_spaces(value, entry):
         while ' ' in value:
             value.remove(' ')
         value = ''.join(value)
-        tables.add_error_edit_code(1, '101', original_value, value, entry)
+        tables.add_error_edit_code(1, '011', original_value, value, entry)
     return value
 
 
@@ -84,7 +85,7 @@ def correct_double_decimals(value, entry):
                 value = list(value)
                 value.pop(index)
                 value = ''.join(value)
-                tables.add_error_edit_code(1, '102', original_value, value, entry)
+                tables.add_error_edit_code(1, '012', original_value, value, entry)
         except ValueError:
             return value
         except IndexError:
@@ -102,7 +103,7 @@ def remove_alphabetical_char(value, entry):
                 while i in value:
                     value.remove(i)
         value = ''.join(value)
-        tables.add_error_edit_code(1, '103', original_value, value, entry)
+        tables.add_error_edit_code(1, '013', original_value, value, entry)
     return value
 
 
@@ -137,7 +138,7 @@ def remove_unexpected_characters(value, entry):
 
     value = ''.join(value)
     if value != original_value:
-        tables.add_error_edit_code(1, '104', original_value, value, entry)
+        tables.add_error_edit_code(1, '014', original_value, value, entry)
     return value
 
 
@@ -147,7 +148,7 @@ def replace_with_decimal(value, index, entry):
     value = list(value)
     value[index] = '.'
     value = ''.join(value)
-    tables.add_error_edit_code(1, '108', original_value, value, entry)
+    tables.add_error_edit_code(1, '018', original_value, value, entry)
     return value
 
 
@@ -155,7 +156,7 @@ def replace_with_decimal(value, index, entry):
 def remove_trailing_digits(value, number, entry):
     original_value = value
     value = value[:len(value) - number]
-    tables.add_error_edit_code(1, '114', original_value, value, entry)
+    tables.add_error_edit_code(1, '024', original_value, value, entry)
     return value
 
 
@@ -166,7 +167,7 @@ def remove_elements_at_indices(value, indices, entry):
     if type(indices) == int:
         value.pop(indices)
         value = ''.join(value)
-        tables.add_error_edit_code(1, '109', original_value, value, entry)
+        tables.add_error_edit_code(1, '019', original_value, value, entry)
         return value
     elif type(indices) == list:
         for i in range(len(indices)):
@@ -174,7 +175,7 @@ def remove_elements_at_indices(value, indices, entry):
             value.pop(j)
             indices.remove(j)
         value = ''.join(value)
-        tables.add_error_edit_code(1, '109', original_value, value, entry)
+        tables.add_error_edit_code(1, '019', original_value, value, entry)
         return ''.join(value)
 
 
@@ -184,7 +185,7 @@ def insert_element_at_index(value, index, element, entry):
     value = list(value)
     value.insert(index, element)
     value = ''.join(value)
-    tables.add_error_edit_code(1, '106', original_value, value, entry)
+    tables.add_error_edit_code(1, '016', original_value, value, entry)
     return value
 
 

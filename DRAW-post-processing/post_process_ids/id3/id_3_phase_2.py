@@ -22,7 +22,7 @@ def compare_observed_corrected (df,field_observed,field_corrected):
        df_comp[df_comp.index.isin
                (temp_observed_errors[temp_observed_errors].index.values)
                ].observation_date)] 
-    log_errors('304', errors_date_temp)    
+    log_errors('302', errors_date_temp)    
 
 
 
@@ -44,7 +44,7 @@ def compare_min_max (df,field_min,field_max):
             max_temp=row['value']
         if not (math.isnan(min_temp)) and not math.isnan(max_temp) and min_temp>max_temp:
             entries_date=df_comp[df_comp.observation_date==obs_date]
-            log_errors('305', entries_date)
+            log_errors('303', entries_date)
    
   
    
@@ -58,7 +58,7 @@ def compare_min_max_df (df,field_min,field_max):
             max_temp=data[data.field_id==field_max].iloc[0][0]
             if not (math.isnan(min_temp)) and not math.isnan(max_temp) and min_temp>max_temp:
                 entries_date=df_comp[df_comp.observation_date==observation_date]
-                log_errors('305', entries_date)
+                log_errors('303', entries_date)
 
     
 
@@ -99,7 +99,7 @@ def flag_outliers (df, field_id):
             obs_date=row['observation_date']
             list_partial=[]
             list_partial.append(row)
-
+#  error code = 025
             
             
             # # Get list of months for outliers

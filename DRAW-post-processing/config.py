@@ -43,8 +43,8 @@ pressure_min = 27.000
 pressure_max = 33.000
 
 # outlier bounds for temperature values
-temperature_min = -100.0
-temperature_max= 180.0
+temperature_min = -45.0
+temperature_max= 135.0
 
 # temperature difference allowed
 temperature_difference_allowed_obs_corr=2
