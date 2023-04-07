@@ -1,5 +1,6 @@
 import mysql.connector
 import sql_commands
+import sqlalchemy
 import os
 
 corrected_table=[]
@@ -20,6 +21,10 @@ conn = mysql.connector.connect(
 )
 
 cursor = conn.cursor()
+
+#url = "mysql+mysqlconnector://"+os.environ.get('DRAW_local_db_user')+":"+os.environ.get('DRAW_local_db_pass')+"@localhost/climate_test"
+url = "mysql+mysqlconnector://"+os.environ.get('DRAW_local_db_user')+":"+os.environ.get('DRAW_local_db_pass')+"@localhost/climatedatarescue"
+engine = sqlalchemy.create_engine(url)
 
 
 # returning raw data entries from database, with all necessary information (columns)

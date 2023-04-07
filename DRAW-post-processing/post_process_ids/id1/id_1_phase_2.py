@@ -18,18 +18,23 @@ def phase_2(entry, lead_digs_added):
 
     if return_list[4] in {4, 6, 7, 8}:
       try:
-        diff_equation_transcribed = abs(float(value) - methods.equation_resultant_value(entry))
-        if diff_equation_transcribed >= config.pressure_diff_threshold:
-
-            if lead_digs_added:
-                methods.check_lead_digs_with_equation(diff_equation_transcribed, return_list, lead_digs_added)
-
-            elif not lead_digs_added:
-                if methods.fluctuation_exceeds_normal(return_list):
-                    pass # TODO : PASS THROUGH check_other_transcription_errors()
-                pass  # TODO : PASS THROUGH check_other_transcription_errors()
-
-        elif diff_equation_transcribed < config.pressure_diff_threshold:
-            pass  # TODO : for when difference is not great, but can try to pick out possible smaller errors
+        resultant_value=methods.equation_resultant_value(entry)
+        if (resultant_value is not None):
+            diff_equation_transcribed = abs(float(value) - resultant_value)
+            if diff_equation_transcribed >= config.pressure_diff_threshold:
+    
+                if lead_digs_added:
+                    methods.check_lead_digs_with_equation(diff_equation_transcribed, return_list, lead_digs_added)
+    
+                elif not lead_digs_added:
+                    if methods.fluctuation_exceeds_normal(return_list):
+                        pass # TODO : PASS THROUGH check_other_transcription_errors()
+                    pass  # TODO : PASS THROUGH check_other_transcription_errors()
+    
+            else:
+                tables.add_to_final_corrected_table(*return_list)
+                pass  # TODO : for when difference is not great, but can try to pick out possible smaller errors
+        else:
+            tables.add_to_final_corrected_table(*return_list)
       except:
           print(value,methods.equation_resultant_value(entry),file=sys.stderr)

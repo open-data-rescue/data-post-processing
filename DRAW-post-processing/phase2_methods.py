@@ -203,7 +203,7 @@ def equation_resultant_value(entry):
                 case _:
                     return None
             try:
-                (1 - ((0.000101 * (float(atb) - 32) - 0.0000102 * (float(atb) - 62)) / (1 + 0.000101 * (float(atb) - 32))))
+                #(1 - ((0.000101 * (float(atb) - 32) - 0.0000102 * (float(atb) - 62)) / (1 + 0.000101 * (float(atb) - 32))))
                 baro_inst_cor = round(float(baro_32) / (1 - ((0.000101 * (float(atb) - 32) - 0.0000102 * (float(atb) - 62)) / (1 + 0.000101 * (float(atb) - 32)))), 3)
                 return baro_inst_cor
             except ValueError:

@@ -46,6 +46,8 @@ def filter_id(pp_id, entry, phase):
                 id1p2.phase_2(entry, True)
             else:
                 id1p2.phase_2(entry, False)
+        elif pp_id==3:
+            pass
         else:
             tables.add_to_final_corrected_table(*entry)
     if phase ==3:

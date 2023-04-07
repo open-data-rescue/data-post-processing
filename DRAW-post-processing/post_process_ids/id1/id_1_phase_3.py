@@ -6,7 +6,7 @@ def phase_3(entry):
     value = entry[1]
     if value!='-999':
         try:
-            value = methods.baro_Eng_in2mb(value)
+            value =  '{:.2f}'.format(methods.baro_Eng_in2mb(value))
         except ValueError:
             value=entry[1]
         except TypeError:

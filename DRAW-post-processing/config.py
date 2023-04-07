@@ -7,7 +7,7 @@ import phase1_methods as methods
 # assign a TUPLE to multiple field_id's with one PPID; otherwise assign integer for single field_id
 ppid_to_field_id = {1: (4, 6, 7, 8, 67, 69),
                     2: 14,
-                    3: (9, 10, 11, 12,36,37,38,39,63,64,68,76,77,78,79)
+                    3: (5,9,10,11,12,13,36,37,38,39,63,64,68,76,77,78,79)
                     }
 
 
@@ -44,18 +44,48 @@ pressure_max = 33.000
 
 # outlier bounds for temperature values
 temperature_min = -100.0
-temperature_max= 180.0
+temperature_max=  {
+    "5": 100, 
+    "9": 120,
+    "10": 120,
+    "11": 110, 
+    "12": 110,
+    "13": 110,
+    "36": 130,
+    "37": 130,
+    "38": 100,
+    "39": 100,
+    "63": 160,
+    "64": 160,
+    "68": 100,
+    "76": 100,
+    "77": 100,
+    "78": 130,
+    "79": 130
+}
+
 
 # temperature difference allowed
 temperature_difference_allowed_obs_corr=2
 
 # temperature corresponding fields observed - corrected
 temperature_corr_observed_fields=[[9,10],[11,12],[36,37],[38,39],[76,77],[78,79]]
-temperature_min_max_fields=[[38,36],[39,37],[76,78],[77,79]]
+temperature_min_max_fields=[[38,36],[39,37],[76,78],[77,79],[81,76],[81,77],[81,38],[81,39],[62,76],[62,77],[62,38],[62,39]]
+
+##TODO
+temperature_less_than_other_fields=[[11,[9]],[12,[10]],[33,[9,10]]] # first field to compare to rest of the list - same observation time
+temperature_min_fields=[[38,9],[39,10],[76,9],[77,10]] # check that the first field is <= to past 24 hours of other field
+temperature_max_fields=[[36,9],[37,10],[78,9],[78,10]] # check that the first field is <= to past 24 hours of other field
+
+temperature_air_wet_bulb_threshold=15
+temperature_air_wet_bulb=[[9,11,13],[10,12,13]] #same observation time: abs(abs(field[0]-field[1])-abs(field[2]))<air_wet_bulb_threshold
 
 # temperature fields to detect stat outliers
 temperature_stat_outliers=[9,10] 
 
+#define whether to display or not graphs for outliers
+temperature_plot_outliers=False
+temperature_outlier_std_factor=5
 
 # threshold value for which fluctuation between previous timestamp and current timestamp (for same field id) requires further investigation (phase 2)
 scalar_fluctuation_thresholds = {'01': 0.00, '02': 0.00, '03': 0.00, '04': 0.00, '05': 0.00, '06': 0.00,  # TODO : fill w/ pressure_fluctuation_stats results
