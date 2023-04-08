@@ -43,6 +43,7 @@ pressure_min = 27.000
 pressure_max = 33.000
 
 # outlier bounds for temperature values
+
 temperature_min = -100.0
 temperature_max=  {
     "5": 100, 
@@ -63,6 +64,7 @@ temperature_max=  {
     "78": 130,
     "79": 130
 }
+
 
 
 # temperature difference allowed

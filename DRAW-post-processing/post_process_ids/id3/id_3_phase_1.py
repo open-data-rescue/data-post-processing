@@ -10,7 +10,7 @@ def phase_1(entry):
     return_list = list(entry)
     value = entry[1]
 
-    # Checking to see if raw pressure value is already of form XX.XXX
+    # Checking to see if raw temperature value is already of form (-)XX.X
     if methods.desired_temperature_format(value):
         tables.add_to_corrected_table(*return_list, 0)
 

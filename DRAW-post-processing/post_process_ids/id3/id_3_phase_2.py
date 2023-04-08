@@ -25,7 +25,7 @@ def compare_observed_corrected (df,field_observed,field_corrected):
        df_comp[df_comp.index.isin
                (temp_observed_errors[temp_observed_errors].index.values)
                ].observation_date)] 
-    log_errors('304', errors_date_temp)    
+    log_errors('302', errors_date_temp)    
 
 
 # verifies that min is less than max at a given time. If not, both entries are marked as errors [305]
@@ -139,7 +139,7 @@ def compare_min_max_df (df,field_min,field_max):
             max_temp=data[data.field_id==field_max].iloc[0][0]
             if not (math.isnan(min_temp)) and not math.isnan(max_temp) and min_temp>max_temp:
                 entries_date=df_comp[df_comp.observation_date==observation_date]
-                log_errors('305', entries_date)
+                log_errors('303', entries_date)
 
 # checks air temperature and wet bulb are less than a certain threshold
 def check_air_wet_bulb(df, fields):
@@ -217,11 +217,12 @@ def flag_outliers (df, field_id):
                         plt.show()
                     #flag the outliers
                     for ind,outlier in outliers.iterrows():
-                        df.at[ind,'flagged']=1
+                        df.at[ind,'flagged']=10
                         
             obs_date=row['observation_date']
             list_partial=[]
             list_partial.append(row)
+
 
 
 
