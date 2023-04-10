@@ -10,13 +10,13 @@ def phase_2(entry, lead_digs_added):
     return_list = list(entry)
     value = return_list[1]
 
-    if value in config.disregarded_values:
+    if value is None:
         tables.add_to_final_corrected_table(*return_list)
 
-    elif value is None:
+    elif value.lower() in config.disregarded_values:
         tables.add_to_final_corrected_table(*return_list)
 
-    if return_list[4] in {4, 6, 7, 8}:
+    elif return_list[4] in {4, 6, 7, 8}:
       try:
         resultant_value=methods.equation_resultant_value(entry)
         if (resultant_value is not None):

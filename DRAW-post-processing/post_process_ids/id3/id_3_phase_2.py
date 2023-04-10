@@ -245,6 +245,7 @@ def phase_2(entries,debug=False):
     
     # Filtering to get only data entries for post process ID 3 that are not empty or retracted, then transform value to numeric
     df_temp=df[df.post_process_id==3]
+    pd.options.mode.chained_assignment = None
     df_temp['value']=pd.to_numeric(df_temp['value'],errors='coerce')
     df_temp_nona=df_temp.dropna()
     tic=logPerf(tic, "Filtered numeric data for temperature")

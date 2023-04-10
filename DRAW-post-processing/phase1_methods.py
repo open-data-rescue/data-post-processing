@@ -31,7 +31,7 @@ def reference_previous_values(entry, option):
                             return list_value[0:2], [ref_info[0], ref_info[1], ref_info[9]]  # ref. value , information about ref. value
                         case 'whole_value':
                             return list_value
-                    tables.add_error_edit_code(1, '010', original_value, str(value), entry)
+                    #tables.add_error_edit_code(1, '010', original_value, str(value), entry)
         except TypeError:
             return None, None
         return None, None
@@ -56,9 +56,11 @@ def extract_decimal(value, entry):
     original_value=value
     value=re.search(r'-?\d+.?\d*', original_value) 
     if value==None:
-        value=''
-    tables.add_error_edit_code(1, '018', original_value, str(value), entry)
-    return value
+        corrected_value=''
+    else:
+        corrected_value=value[0]
+    tables.add_error_edit_code(1, '018', original_value, corrected_value, entry)
+    return corrected_value
     
     
 # remove any spaces present in the data entry
