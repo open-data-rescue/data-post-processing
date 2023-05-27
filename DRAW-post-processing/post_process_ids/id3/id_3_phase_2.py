@@ -205,16 +205,18 @@ def flag_outliers (df, field_id):
                 if outliers.size >0:
                     if config.temperature_plot_outliers == True:
                         ans_max=ans+config.temperature_outlier_std_factor*standard_deviation
-                        ans_min=ans-config.temperature_outlier_std_factor*standard_deviation                   
-                        plt.plot(x, y, '.', color ='black', label ="data")
-                        plt.plot(x, ans, '--', color ='blue', label ="rolling mean")
-                        plt.plot(x,ans_max,'-.', color='green')
-                        plt.plot(x,ans_min,'-.', color='green')
-                        plt.plot(outliers.observation_date, outliers.value,'o', color='red', label="Outliers")
-                        plt.title("Field: " +str(field_id))
-                        plt.legend()
-                        plt.ion()
-                        plt.show()
+                        ans_min=ans-config.temperature_outlier_std_factor*standard_deviation   
+                        fig, ax = plt.subplots(1, figsize = (20, 8))
+                        fig.autofmt_xdate()
+                        ax.plot(x, y, '.', color ='black', label ="data")
+                        ax.plot(x, ans, '--', color ='blue', label ="rolling mean")
+                        ax.plot(x,ans_max,'-.', color='green', label=str(config.temperature_outlier_std_factor)+" sigma")
+                        ax.plot(x,ans_min,'-.', color='green')
+                        ax.plot(outliers.observation_date, outliers.value,'o', color='red', label="Outliers")
+                        ax.set_title("Field: " +str(field_id)+" - " + df_partial.field_key.iloc[0])
+                        ax.legend()
+                        #plt.ion()
+                        #ax.show()
                     #flag the outliers
                     for ind,outlier in outliers.iterrows():
                         df.at[ind,'flagged']=10
