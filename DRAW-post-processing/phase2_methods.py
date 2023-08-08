@@ -61,6 +61,7 @@ def fluctuation_exceeds_normal(entry):
                 counter = +1
                 index_limit_condition = len(entries)
                 which_side = 'subsequent'
+
         while True:
             if entry_index + counter == index_limit_condition:
                 return step_through_adjacent_day(entry_list, which_side)
@@ -80,16 +81,10 @@ def fluctuation_exceeds_normal(entry):
             counter += counter
 
     if entry[9] is not None:
-        sql_ref_same_day = sql.ref_adjacent_fluctuations(entry, entry[9]) # getting values for same date
+        sql_ref_same_day = sql.ref_adjacent_fluctuations(entry, entry[9])
         cursor.execute(sql_ref_same_day)
         entries = cursor.fetchall()
-
-        entry_index=0
-        for en in entries:
-            if en[0]==entry[0]:
-                break
-            else:
-                entry_index+=1
+        entry_index = entries.index(entry)
 
         left_scalar_exceeds_limit = step_through_same_day(entry, 'before')
         right_scalar_exceeds_limit = step_through_same_day(entry, 'after')

@@ -205,18 +205,16 @@ def flag_outliers (df, field_id):
                 if outliers.size >0:
                     if config.temperature_plot_outliers == True:
                         ans_max=ans+config.temperature_outlier_std_factor*standard_deviation
-                        ans_min=ans-config.temperature_outlier_std_factor*standard_deviation   
-                        fig, ax = plt.subplots(1, figsize = (20, 8))
-                        fig.autofmt_xdate()
-                        ax.plot(x, y, '.', color ='black', label ="data")
-                        ax.plot(x, ans, '--', color ='blue', label ="rolling mean")
-                        ax.plot(x,ans_max,'-.', color='green', label=str(config.temperature_outlier_std_factor)+" sigma")
-                        ax.plot(x,ans_min,'-.', color='green')
-                        ax.plot(outliers.observation_date, outliers.value,'o', color='red', label="Outliers")
-                        ax.set_title("Field: " +str(field_id)+" - " + df_partial.field_key.iloc[0])
-                        ax.legend()
-                        #plt.ion()
-                        #ax.show()
+                        ans_min=ans-config.temperature_outlier_std_factor*standard_deviation                   
+                        plt.plot(x, y, '.', color ='black', label ="data")
+                        plt.plot(x, ans, '--', color ='blue', label ="rolling mean")
+                        plt.plot(x,ans_max,'-.', color='green')
+                        plt.plot(x,ans_min,'-.', color='green')
+                        plt.plot(outliers.observation_date, outliers.value,'o', color='red', label="Outliers")
+                        plt.title("Field: " +str(field_id))
+                        plt.legend()
+                        plt.ion()
+                        plt.show()
                     #flag the outliers
                     for ind,outlier in outliers.iterrows():
                         df.at[ind,'flagged']=10
@@ -245,6 +243,7 @@ def phase_2(entries,debug=False):
                              'annotation_id','transcription_id','post_process_id',
                              'observation_date','flagged'])
     
+    
     # Filtering to get only data entries for post process ID 3 that are not empty or retracted, then transform value to numeric
     df_temp=df[df.post_process_id==3]
     pd.options.mode.chained_assignment = None
@@ -269,7 +268,10 @@ def phase_2(entries,debug=False):
     
     # check temperature is the min of other values within past 24 hours max
     for fields in config.temperature_min_fields:
-        check_field_is_min_over_period(df_temp_nona, fields[0], fields[1])
+        try:
+            check_field_is_min_over_period(df_temp_nona, fields[0], fields[1])
+        except:
+            print(df_temp_nona, fields[0], fields[1])
     tic=logPerf(tic, "Completed field is minimum of other fields over period of time")
     
     # check temperature is the max of other values within past 24 hours max
@@ -283,6 +285,9 @@ def phase_2(entries,debug=False):
     tic=logPerf(tic, "Completed field is maximum of other fields over period of time")   
         
     # statistical outliers
+    
+    ## check type of date in entries
+    
     if debug==False: 
         tables.populate_error_edit_code(2)
         # get list of annotation ids from error table and remove them from df_temp_nona
