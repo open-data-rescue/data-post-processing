@@ -3,6 +3,7 @@
 import mysql.connector.errors
 import database_connection as db
 import sql_commands as sql
+import pandas as pd
 
 db_conn = db.conn
 cursor = db.cursor
@@ -151,7 +152,12 @@ def populate_error_edit_code(phase):
     if phase==1:        
         cursor.executemany(sql_command, phase_1_errors)
     elif phase==2:
-        cursor.executemany(sql_command, phase_2_errors)
+       # cursor.executemany(sql_command, phase_2_errors)
+        #create data frame from phase 2 errors, instead of above
+        #data frame.to_sql
+        df_temp=pd.DataFrame(phase_2_errors, 
+                        columns=[ 'id', 'ORIGINAL_VALUE', 'CORRECTED_VALUE', 'error_code', 'user_id', 'page_id', 'field_id', 'field_key', 'annotation_id', 'transcription_id', 'post_process_id', 'observation_date', 'additional_info'])
+        df_temp.to_sql('data_entries_phase_2', db.engine, if_exists='append', index=False)
     db_conn.commit()   
 
     

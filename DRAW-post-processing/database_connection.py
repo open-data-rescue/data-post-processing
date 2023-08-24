@@ -13,8 +13,8 @@ duplicateless=[]
 # connection to copy of database on local machine
 conn = mysql.connector.connect(
     #####   FOLLOWING 3 VARIABLES TO BE CONFIGURED AS NECESSARY FOR LOCAL MACHINE:   #####
-    user=os.environ.get('DRAW_local_db_user'),
-    password=os.environ.get('DRAW_local_db_pass'),
+    user='',
+    password='',
     #database='climate_test',
     database='climatedatarescue',
     host='localhost'
@@ -23,7 +23,8 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 
 #url = "mysql+mysqlconnector://"+os.environ.get('DRAW_local_db_user')+":"+os.environ.get('DRAW_local_db_pass')+"@localhost/climate_test"
-url = "mysql+mysqlconnector://"+os.environ.get('DRAW_local_db_user')+":"+os.environ.get('DRAW_local_db_pass')+"@localhost/climatedatarescue"
+url = "mysql+mysqlconnector://"+'user'+":"+'password'+"@localhost/climatedatarescue"
+#url = "mysql+mysqlconnector://"+''+":"+''+"@localhost/climate_test"
 engine = sqlalchemy.create_engine(url)
 
 

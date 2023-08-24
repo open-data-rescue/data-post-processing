@@ -15,6 +15,17 @@ import post_process_ids.id3.id_3_phase_1 as id3p1
 import post_process_ids.id3.id_3_phase_2 as id3p2
 import post_process_ids.id3.id_3_phase_3 as id3p3
 
+import post_process_ids.id4.id_4_phase_1 as id4p1
+import post_process_ids.id4.id_4_phase_3 as id4p3
+
+import post_process_ids.id5.id_5_phase_1 as id5p1
+import post_process_ids.id5.id_5_phase_3 as id5p3
+
+import post_process_ids.id6.id_6_phase_1 as id6p1
+import post_process_ids.id6.id_6_phase_3 as id6p3
+
+import post_process_ids.id7.id_7_phase_1 as id7p1
+import post_process_ids.id7.id_7_phase_3 as id7p3
 
 import post_process_ids.id1.id_1_outliers as id1outliers
 import post_process_ids.id3.id_3_outliers as id3outliers
@@ -35,9 +46,16 @@ def filter_id(pp_id, entry, phase):
     if phase==1:
         if pp_id==1:
             id1p1.phase_1(entry)
-            
         if pp_id==3:
             id3p1.phase_1(entry)
+        if pp_id==4:
+            id4p1.phase_1(entry)
+        if pp_id==5:
+            id5p1.phase_1(entry)
+        if pp_id==6:
+            id6p1.phase_1(entry)
+        if pp_id==7:
+            id7p1.phase_1(entry)
         else:
             tables.add_to_corrected_table(*entry, 0)
     if phase==2:
@@ -55,10 +73,19 @@ def filter_id(pp_id, entry, phase):
             id1p3.phase_3(entry)
         elif pp_id==3:
             id3p3.phase_3(entry)
- 
+        elif pp_id==4:
+            id4p3.phase_3(entry)
+        elif pp_id==5:
+            id5p3.phase_3(entry)
+        elif pp_id==6:
+            id6p3.phase_3(entry)
+        elif pp_id==7:
+            id7p3.phase_3(entry)
+            
     elif phase== 'outlier_removal':
         if pp_id ==1:
-            return id1outliers.patch_outlier(entry)
+            #return id1outliers.patch_outlier(entry)
+            pass
         elif pp_id ==3:
             return id3outliers.patch_outlier(entry)
             return 
@@ -142,7 +169,6 @@ for index in range(len(entries)):
 logPerf("Removed outliers")
 
 pressure_lead_digs_added = id1p2_methods.pressure_artificial_lead_digs_list()
-
 counter = 0
 print ("Phase 2:")
 for row in entries:
