@@ -10,21 +10,24 @@ phase_1_errors=[]
 phase_2_errors=[]
 duplicateless=[]
 
+db_user=os.environ.get('DRAW_local_db_user')
+db_passwd=os.environ.get('DRAW_local_db_pass')
+db_name=os.environ.get('DRAW_local_db_name')
+#db_name="climate_test"
+#db_name="climatedatarescueprocessed"
 # connection to copy of database on local machine
 conn = mysql.connector.connect(
     #####   FOLLOWING 3 VARIABLES TO BE CONFIGURED AS NECESSARY FOR LOCAL MACHINE:   #####
-    user='',
-    password='',
-    #database='climate_test',
-    database='climatedatarescue',
+    user=db_user,
+    password=db_passwd,
+    database=db_name,
     host='localhost'
 )
 
 cursor = conn.cursor()
 
-#url = "mysql+mysqlconnector://"+os.environ.get('DRAW_local_db_user')+":"+os.environ.get('DRAW_local_db_pass')+"@localhost/climate_test"
-url = "mysql+mysqlconnector://"+'user'+":"+'password'+"@localhost/climatedatarescue"
-#url = "mysql+mysqlconnector://"+''+":"+''+"@localhost/climate_test"
+url = "mysql+mysqlconnector://"+db_user+":"+db_passwd+"@localhost/"+db_name
+#url = "mysql+mysqlconnector://"+'user'+":"+'password'+"@localhost/climatedatarescue"
 engine = sqlalchemy.create_engine(url)
 
 

@@ -32,6 +32,9 @@ import post_process_ids.id3.id_3_outliers as id3outliers
 
 import phase2_methods as id1p2_methods
 import time
+
+import sef_gen
+
 #import argparse
 
 def logPerf(message):
@@ -84,7 +87,7 @@ def filter_id(pp_id, entry, phase):
             
     elif phase== 'outlier_removal':
         if pp_id ==1:
-            #return id1outliers.patch_outlier(entry)
+            return id1outliers.patch_outlier(entry)
             pass
         elif pp_id ==3:
             return id3outliers.patch_outlier(entry)
@@ -210,3 +213,10 @@ logPerf("Completed phase 3")
 tables.delete_table('data_entries_raw')
 tables.delete_table('data_entries_corrected')
 tables.delete_table('data_entries_corrected_duplicateless')
+logPerf("cleaned up database")
+
+
+#################### Generating SEF files ##########################
+print("Generating SEF files")
+sef_gen.generateSEFs()
+logPerf("SEF files generated")
