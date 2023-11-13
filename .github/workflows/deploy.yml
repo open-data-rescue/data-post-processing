@@ -23,7 +23,11 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
-    # No env...
+    # env...
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
