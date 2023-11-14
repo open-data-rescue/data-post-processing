@@ -28,17 +28,17 @@ are:
 
 To run the data processing python script after you have pull the image use
 
-`
-docker run \
-  --env DRAW_local_db_user=draw_user \
-  --env DRAW_local_db_pass=draw_user_password \
-  --env DRAW_local_db_name=climate_data_rescue \
-  --env DRAW_db_host=localhost \
-  --env DRAW_db_port=3306 \
-  -it --rm --network host \
-  --mount type=bind,source="./SEF",target=/opt/draw-post-processing/SEF \
-  ghcr.io/open-data-rescue/data-post-processing
-`
+```
+  docker run \
+    --env DRAW_local_db_user=draw_user \
+    --env DRAW_local_db_pass=draw_user_password \
+    --env DRAW_local_db_name=climate_data_rescue \
+    --env DRAW_db_host=localhost \
+    --env DRAW_db_port=3306 \
+    -it --rm --network host \
+    --mount type=bind,source="./SEF",target=/opt/draw-post-processing/SEF \
+    ghcr.io/open-data-rescue/data-post-processing
+```
 
 ## NOTES:
 
