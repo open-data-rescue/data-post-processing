@@ -1,5 +1,4 @@
 # File in which all methods that are called upon in pressure format workflow are stored, for repurposability and modularity of code
-
 import config
 import sql_commands as sql
 import database_connection as db
@@ -20,10 +19,10 @@ def reference_previous_values(entry, option):
         cursor.execute(command)
         list_entries = cursor.fetchall()
         if len(list_entries) == 0:
-            return -1,None
+            return -1, None
         try:
             for list_entry in list_entries:
-                list_value=list_entry[1]
+                list_value = list_entry[1]
                 if (list_value[0:2] in config.possible_lead_digits_pressure) and (config.possible_pressure_formats(list_value, True)):
                     match option:
                         case 'leading_digits':
@@ -42,7 +41,7 @@ def reference_previous_values(entry, option):
             return None, None
         return result, info
     else:
-    
+
         result, info = modular_code_block(entry, sql.check_2_command(entry, 0), 2)
         if result is not None:
             if result == -1:
@@ -51,28 +50,17 @@ def reference_previous_values(entry, option):
         else:
             return None, None
 
+
 # extract decimal from a string containing text and decimal
 def extract_decimal(value, entry):
-    original_value=value
-    value=re.search(r'-?\d+.?\d*', original_value) 
-    if value==None:
-        corrected_value=''
+    original_value = value
+    value = re.search(r'-?\d+.?\d*', original_value)
+    if value == None:
+        corrected_value = ''
     else:
-        corrected_value=value[0]
+        corrected_value = value[0]
     tables.add_error_edit_code(1, '018', original_value, corrected_value, entry)
     return corrected_value
-    
-    
-# remove any spaces present in the data entry
-def remove_spaces(value, entry):
-    if ' ' in value:
-        original_value = value
-        value = list(value)
-        while ' ' in value:
-            value.remove(' ')
-        value = ''.join(value)
-        tables.add_error_edit_code(1, '011', original_value, value, entry)
-    return value
 
 
 # remove double decimals '..' in the data entry if instance is surrounded by a digit on both sides
@@ -92,6 +80,18 @@ def correct_double_decimals(value, entry):
             return value
         except IndexError:
             return value
+    return value
+
+
+# remove any spaces present in the data entry
+def remove_spaces(value, entry):
+    if ' ' in value:
+        original_value = value
+        value = list(value)
+        while ' ' in value:
+            value.remove(' ')
+        value = ''.join(value)
+        tables.add_error_edit_code(1, '011', original_value, value, entry)
     return value
 
 
@@ -153,6 +153,31 @@ def replace_with_decimal(value, index, entry):
     tables.add_error_edit_code(1, '018', original_value, value, entry)
     return value
 
+# remove any negetaie signs for values with should always be > 0
+def remove_negatives(value, entry):
+    original_value = value
+    try:
+        if ('-' in value):
+            value=value.replace('-','')
+        if value != original_value:
+            tables.add_error_edit_code(1, '020', original_value, value, entry)
+    except ValueError:
+        pass
+    return value
+
+
+# remove any question marks for values with should always be > 0
+def remove_question(value, entry):
+    original_value = value
+    try:
+        if ('?' in value):
+            value = value.replace('?','')
+        if value != original_value:
+            tables.add_error_edit_code(1, '021', original_value, value, entry)
+    except ValueError:
+        pass
+    return value
+
 
 # removes a set amount of trailing digits from a number (specified by 'number' parameter)
 def remove_trailing_digits(value, number, entry):
@@ -193,6 +218,32 @@ def insert_element_at_index(value, index, element, entry):
 
 ##################### CONDITIONAL STATEMENT CHECKS BELOW #####################
 
+# Checking to see if value is a float, integer or character
+
+def desired_cloudcover_format(value):
+    try:
+        int(value)
+#        if len(value) == 2:
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    return False
+
+
+def desired_precipitation_format(value):
+    try:
+        float(value)
+#        if len(value) <= 5 and float_decimal_index(value) <= 2:
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    return False
+
+
 # Checking to see if raw pressure value is of form XX.XXX
 def desired_pressure_format(value):
     try:
@@ -205,7 +256,19 @@ def desired_pressure_format(value):
         return False
     return False
 
-# Checking to see if temperature value is a float
+
+def desired_relhum_format(value):
+    try:
+        float(value)
+#        if len(value) == 6 and float_decimal_index(value) == 2:
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    return False
+
+
 def desired_temperature_format(value):
     try:
         float(value)
@@ -216,6 +279,31 @@ def desired_temperature_format(value):
     except TypeError:
         return False
     return False
+
+
+def desired_vapourpressure_format(value):
+    try:
+        float(value)
+#        if len(value) <= 4:
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    return False
+
+
+def desired_windvelocity_format(value):
+    try:
+        float(value)
+#        if len(value) == 6 and float_decimal_index(value) == 2:
+        return True
+    except ValueError:
+        return False
+    except TypeError:
+        return False
+    return False
+
 
 # returns True if value is of form XX XXX where the space is one of ( '/'  ';'  ','  '-' )
 def pressure_decimal_alternate(value):

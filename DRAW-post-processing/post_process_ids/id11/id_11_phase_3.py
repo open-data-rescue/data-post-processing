@@ -1,6 +1,7 @@
 import tables
-import phase3_methods as methods
-#  id 6 = velocity
+# import phase3_methods as methods
+import lmrlib
+# id 11 = cloud cover (tenths)
 
 
 def phase_3(entry):
@@ -9,7 +10,7 @@ def phase_3(entry):
     if value != '-999':
         try:
             v=float(value)
-            value = '{:.2f}'.format((methods.vel_mph2mps(v)))
+            value = '{:.1f}'.format(lmrlib.cloud_tenthscovered2oktas(v))
         except ValueError:
             value = entry[1]
         except TypeError:

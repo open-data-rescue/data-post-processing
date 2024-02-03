@@ -1,6 +1,6 @@
 import tables
 import phase3_methods as methods
-#  id 6 = velocity
+# id3 = distance (miles), eg distance wind has run
 
 
 def phase_3(entry):
@@ -8,8 +8,12 @@ def phase_3(entry):
     value = entry[1]
     if value != '-999':
         try:
-            v=float(value)
-            value = '{:.2f}'.format((methods.vel_mph2mps(v)))
+            v=float(value)/3600.0
+            value = '{:.2f}'.format((methods.dis_mi2m(v)))
+            if entry[4] == 35:
+                value = value / (3.0)
+            elif entry[4] == 48:
+                value = value / (24.0)
         except ValueError:
             value = entry[1]
         except TypeError:

@@ -4,8 +4,6 @@ import tables
 import phase1_methods as methods
 
 
-
-
 def phase_1(entry):
     return_list = list(entry)
     value = entry[1]
@@ -19,20 +17,19 @@ def phase_1(entry):
 
     elif value is None:
         tables.add_to_corrected_table(*return_list, 0)
-    
+
     elif "dry" in value.lower() or "frozen" in value.lower():
-        value=methods.extract_decimal(value, return_list)
+        value = methods.extract_decimal(value, return_list)
         tables.add_to_corrected_table(*return_list, 0)
 
-    # if not of the right form initially, corrects format and returns entry with corrected value
+# if not of the right form initially, corrects format and returns entry with corrected value
     else:
-
         value = methods.remove_spaces(value, return_list)
         value = methods.correct_double_decimals(value, return_list)
         value = methods.remove_alphabetical_char(value, return_list)
         value = methods.remove_unexpected_characters(value, return_list)
-        value = value.replace(";",".")
-
+        value = methods.remove_question(value, return_list)
+        value = value.replace(";", ".")
         return_list[1] = value
         if methods.desired_temperature_format(value):
             tables.add_to_corrected_table(*return_list, 0)

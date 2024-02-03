@@ -31,7 +31,10 @@ def data_entries_raw(index_type, action):
                 case 'create':
                     cursor.execute("CREATE INDEX data_entries_raw_user_index ON data_entries_raw (user_id);")
                 case 'delete':
-                    cursor.execute("DROP INDEX data_entries_raw_user_index ON data_entries_raw;")
+                    try:
+                        cursor.execute("DROP INDEX data_entries_raw_user_index ON data_entries_raw;")
+                    except :
+                        print ("Couldn't drop index data_entries_raw_user_index")
 
 
 def data_entries_corrected(index_type, action):

@@ -1,7 +1,6 @@
 import tables
 import phase3_methods as methods
-# id 7 = weather fields
-
+# id 10 = relative humidity
 
 def phase_3(entry):
     return_list = list(entry)
