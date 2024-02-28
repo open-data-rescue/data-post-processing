@@ -3,7 +3,7 @@
 import database_connection as db
 import statistics as stats
 import tables
-
+import logs as p
 cursor = db.cursor
 
 
@@ -13,7 +13,7 @@ def remove_duplicates():
 
     counter = 0
     checked_entries = {}
-    print("Reconciliation:")
+    p.log("Reconciliation:")
     for entry in data_entries:
         if entry[9] is not None and entry[0] not in checked_entries.keys():
             cursor.execute("SELECT * FROM data_entries_corrected "
@@ -50,7 +50,7 @@ def remove_duplicates():
             tables.add_to_duplicateless_table(*entry)
         counter += 1
         if (counter % 1000) == 0:
-            print('.', end="")
+            p.log('.', end="")
         if (counter % 50000) == 0:
-            print("")
+            p.log("")
     tables.populate_duplicateless_table()

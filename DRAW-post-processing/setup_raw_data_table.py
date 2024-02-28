@@ -14,3 +14,6 @@ def set_up_raw_data_table(continue_flag):
     # TODO : update other field id's with their respective pp_id
 
     tables.create_raw_data_table(continue_flag)
+    tables.create_post_processing_reports_table()
+    tables.create_outliers_stats_table()
+    

@@ -1,4 +1,5 @@
 import database_connection as db
+import datetime
 import tables
 import observation_reconciliation as reconcile
 import remove_low_transcription_users as remove_ltu
@@ -32,16 +33,15 @@ import post_process_ids.id3.id_3_outliers as id3outliers
 
 import phase2_methods as id1p2_methods
 import time
-
+import logs as l
 import sef_gen
 
-#import argparse
 
 def logPerf(message):
     global tic
     toc = time.perf_counter()
-    print(message, end='')
-    print (f":  {toc - tic:0.4f} seconds")
+    l.log(message, end='')
+    l.log (f":  {toc - tic:0.4f} seconds")
     tic=toc
 
 # point data entry to particular post_processing algorithm for phase 1 depending on its post_process_id
@@ -95,7 +95,12 @@ def filter_id(pp_id, entry, phase):
         else:
             pass
 
+
+# REdirecting stdout to a stream so that it can be saved in a DB
+
 tic = time.perf_counter()
+start_time=datetime.datetime.now()
+
 
 # Experimental: implement a continue flag
 continue_flag=False
@@ -129,17 +134,17 @@ tables.create_error_edit_table(1,continue_flag)
 
 logPerf("Created indexed for raw data processing")
 
-print ("Phase 1: ")
+l.log ("Phase 1: ")
 counter = 0
 for row in raw_entries:
     post_process_id = row[8]
     filter_id(post_process_id, row, 1)
     counter += 1
     if (counter % 1000) == 0:
-        print('.', end="")
+        l.log('.', end="")
     if (counter % 50000) == 0:
-        print("")
-print("")
+        l.log("")
+l.log("")
 logPerf("Phase 1 complete")
 
 # Save corrected data in database
@@ -173,18 +178,19 @@ logPerf("Removed outliers")
 
 pressure_lead_digs_added = id1p2_methods.pressure_artificial_lead_digs_list()
 counter = 0
-print ("Phase 2:")
+l.log ("Phase 2:")
 for row in entries:
     post_process_id = row[8]
     filter_id(post_process_id, row, 2)
     counter += 1
     if (counter % 1000) == 0:
-        print('.', end="")
+        l.log('.', end="")
     if (counter % 50000) == 0:
-        print("")
+        l.log("")
 
 logPerf("Completed post-process 1 phase 2")
-id3p2.phase_2(entries)
+tables.create_outliers_graphs()
+outlier_graphs=id3p2.phase_2(entries)
 logPerf("Completed post-process 3 phase 2")
 
 tables.populate_final_corrected_table()
@@ -193,7 +199,7 @@ tables.populate_error_edit_code(2)
 logPerf("Phase 2 complete")
 
 #####################       EXECUTE PHASE 3 (ISO TRANSLATION)       #########################
-print ("Phase 3:")
+l.log ("Phase 3:")
 tables.create_final_corrected_table_iso(continue_flag)
 entries=db.phase_2_data()
 for row in entries:
@@ -201,13 +207,22 @@ for row in entries:
     filter_id(post_process_id, row, 3)
     counter += 1
     if (counter % 1000) == 0:
-        print('.', end="")
+        l.log('.', end="")
     if (counter % 50000) == 0:
-        print("")
+        l.log("")
 tables.populate_final_corrected_table_iso()
 
 logPerf("Completed phase 3")    
 
+#################### Generating SEF files ##########################
+l.log("Generating SEF files")
+sef_gen.generateSEFs()
+logPerf("SEF files generated")
+
+#################### Saving report #############################
+report_id= tables.writeReport(l.report,start_time)
+tables.insert_outlier_graphs(report_id, outlier_graphs)
+tables.insert_outlier_stats(report_id, db.outliers_stats())
 
 #####################       DELETE ALL DISPENSABLE TABLES (KEEP FINAL + ERRORS/EDITS TABLES)       ############################
 tables.delete_table('data_entries_raw')
@@ -216,7 +231,3 @@ tables.delete_table('data_entries_corrected_duplicateless')
 logPerf("cleaned up database")
 
 
-#################### Generating SEF files ##########################
-print("Generating SEF files")
-sef_gen.generateSEFs()
-logPerf("SEF files generated")

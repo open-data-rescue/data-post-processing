@@ -4,6 +4,7 @@ import mysql.connector.errors
 import database_connection as db
 import sql_commands as sql
 import pandas as pd
+import config
 
 db_conn = db.conn
 cursor = db.cursor
@@ -198,3 +199,57 @@ def get_error_code_annotations(phase, ppid):
 def delete_table(name):
     sql_command = "DROP TABLE {};".format(name)
     cursor.execute(sql_command)
+
+# Create PostProcessing table
+def create_post_processing_reports_table():
+    sql_command="CREATE TABLE IF NOT EXISTS post_processing_reports ( "\
+        "id int NOT NULL auto_increment,"\
+        "runtime datetime NOT NULL, "\
+        "report TEXT NOT NULL,"\
+        "PRIMARY KEY (id))"
+    cursor.execute(sql_command)
+    db_conn.commit()
+    
+def create_outliers_stats_table():
+    sql_command="CREATE TABLE IF NOT EXISTS outlier_stats ( "\
+        "id int NOT NULL auto_increment,"\
+        "report_id int NOT NULL, "\
+        "field_id varchar(32) default '',"\
+        "count int not null default 0,"\
+        "PRIMARY KEY (id))"
+    cursor.execute(sql_command)
+    db_conn.commit()
+
+def writeReport (report_out, start_time):
+    sql_command="INSERT INTO post_processing_reports (runtime, report) values (%s,%s)"
+    cursor.execute(sql_command, (start_time, report_out))
+    db_conn.commit()
+    return cursor.lastrowid
+
+def create_outliers_graphs():
+    sql_command="CREATE table if not exists outlier_graphs ("\
+        "id int not null auto_increment,"\
+        "report_id int not null,"\
+        "field_id  int not null,"\
+        "data  text not null, "\
+        "primary key (id))"
+    cursor.execute(sql_command)
+    db_conn.commit()
+    
+def insert_outlier_graphs(report_id,graphs):
+    for graph in graphs:
+        (field_id,data)=graph[0]
+        sql_command="insert into outlier_graphs "\
+            "(report_id,field_id,data) "\
+            "values (%s, %s, %s);"
+        cursor.execute(sql_command,(report_id,field_id,data))
+        db_conn.commit()
+        
+def insert_outlier_stats(report_id,stats):
+    for stat in stats:
+        (field_id,count)=stat
+        sql_command="insert into outlier_stats "\
+            "(report_id,field_id,count) "\
+            "values (%s, %s, %s);"
+        cursor.execute(sql_command, (report_id,field_id,count))
+        db_conn.commit()

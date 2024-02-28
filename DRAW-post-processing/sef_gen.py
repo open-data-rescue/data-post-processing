@@ -3,6 +3,8 @@ import database_connection as db
 import datetime
 import config
 import os
+import logs as p
+
 cursor = db.cursor
 
 def generateSEFs():
@@ -76,7 +78,7 @@ def getFilename(sef_type,type_result_set):
             
     
 def generateSEF(sef_type):
-    print("Generating SEF for type: " + sef_type)
+    p.log("Generating SEF for type: " + sef_type)
     if type(config.sef_type_to_field_id[sef_type]) == int:
         query="select value,observation_date from data_entries_corrected_final_iso where field_id = {} order by observation_date asc".format(config.sef_type_to_field_id[sef_type])
     else:
@@ -94,7 +96,7 @@ def generateSEF(sef_type):
                 "\t"+value+"\t|\t\n"
             type_result_set.append(result_str)
         except:
-            print ("Couldn't generate SEF line for value="+str(value)+", observation date ="+str(observation_date))
+            p.log ("Couldn't generate SEF line for value="+str(value)+", observation date ="+str(observation_date))
         
         
     (filename,index_start,index_end)=getFilename(sef_type, type_result_set)

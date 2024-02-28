@@ -26,7 +26,7 @@ conn = mysql.connector.connect(
 
 cursor = conn.cursor()
 
-url = "mysql+mysqlconnector://"+db_user+":"+db_passwd+"@l"+db_host+"/"+db_name
+url = "mysql+mysqlconnector://"+db_user+":"+db_passwd+"@"+db_host+"/"+db_name
 engine = sqlalchemy.create_engine(url)
 
 
@@ -56,3 +56,9 @@ def phase_2_data():
     cursor.execute(sql_command)
     result = cursor.fetchall()
     return result
+
+def outliers_stats():
+    sql_command=sql_commands.outliers_stats_sql
+    cursor.execute(sql_command)
+    result = cursor.fetchall()
+    return result    

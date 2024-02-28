@@ -69,6 +69,7 @@ phase_1_data_sql = "SELECT * FROM data_entries_corrected_duplicateless;"
 phase_1_data_test_sql = "SELECT * FROM data_entries_corrected_duplicateless_test;"
 
 phase_2_data_sql = "select * from data_entries_corrected_final"
+outliers_stats_sql="select field_id,count(*) from data_entries_corrected_final where flagged=10 group by field_id"
 
 # MySQL commands used during post-processing phases:
 

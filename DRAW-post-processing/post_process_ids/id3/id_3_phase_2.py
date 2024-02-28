@@ -5,9 +5,7 @@ import database_connection as db
 import config
 import math
 import time
-#import numpy as np
-# curve-fit() function imported from scipy
-#from scipy.optimize import curve_fit
+import logs as p
 from matplotlib import pyplot as plt
 
 
@@ -17,7 +15,7 @@ def log_errors(code,errors):
 
 # compares observed and corrected values. If not within a threshold, they are both marked as error [304]
 def compare_observed_corrected (df,field_observed,field_corrected):
-    print("   Comparing observed vs corrected for fields " + str(field_observed)+" vs "+str(field_corrected))
+    p.log("   Comparing observed vs corrected for fields " + str(field_observed)+" vs "+str(field_corrected))
     df_comp=df[df['field_id'].isin([field_observed,field_corrected]) ]
     temp_observed_errors=df_comp.groupby(['observation_date'])['value'].diff().dropna().abs().gt(config.temperature_difference_allowed_obs_corr)
 
@@ -30,7 +28,7 @@ def compare_observed_corrected (df,field_observed,field_corrected):
 
 # verifies that min is less than max at a given time. If not, both entries are marked as errors [305]
 def compare_min_max (df,field_min,field_max):
-    print("   Comparing min/max for fields "+str(field_min) +"/"+str(field_max))
+    p.log("   Comparing min/max for fields "+str(field_min) +"/"+str(field_max))
     df_comp=df[df['field_id'].isin([field_min,field_max])].sort_values(by=['observation_date'])
     obs_date=None
     min_temp=math.nan
@@ -52,7 +50,7 @@ def compare_min_max (df,field_min,field_max):
 
 # Verifies that the first field in the list is less than all other fields - same observation time. If not, marked as flagged [2]
 def compare_field_less_than_other_fields(df,fields):
-    print ("   Comparing that field "+str(fields[0])+" is less than these fields: "+str(fields[1])) 
+    p.log ("   Comparing that field "+str(fields[0])+" is less than these fields: "+str(fields[1])) 
     df_comp=df[df['field_id'].isin(fields)].sort_values(by=['observation_date'])
     obs_date=None
     min_temp=math.nan
@@ -84,7 +82,7 @@ def compare_field_less_than_other_fields(df,fields):
 
 # check the the min field is the min of all previous fields between last min field measurement or 24 hours. If not marked as flagged [3]
 def check_field_is_min_over_period(df,min_field,max_field):
-    print ("   Checking that field "+str(min_field)+" is the minimum of all values of this field: "+str(max_field))       
+    p.log ("   Checking that field "+str(min_field)+" is the minimum of all values of this field: "+str(max_field))       
     df_comp=df[df['field_id'].isin([min_field,max_field])].sort_values(by=['observation_date'])
     obs_date=None
     min_temp=math.nan
@@ -106,7 +104,7 @@ def check_field_is_min_over_period(df,min_field,max_field):
                 
 # check that the max field is the max of all previous fields between last max field measurement or 24 hours. If not marked as flagged [4]                
 def check_field_is_max_over_period(df,max_field,min_field):
-    print ("   Checking that field "+str(max_field)+" is the maximum of all values of this field: "+str(min_field))       
+    p.log ("   Checking that field "+str(max_field)+" is the maximum of all values of this field: "+str(min_field))       
     df_comp=df[df['field_id'].isin([max_field,min_field])].sort_values(by=['observation_date'])
     obs_date=None
     max_temp=math.nan
@@ -143,7 +141,7 @@ def compare_min_max_df (df,field_min,field_max):
 
 # checks air temperature and wet bulb are less than a certain threshold
 def check_air_wet_bulb(df, fields):
-    print ("   Checking wet bulb for fields: "+str(fields))       
+    p.log ("   Checking wet bulb for fields: "+str(fields))       
     df_comp=df[df['field_id'].isin([fields])].sort_values(by=['observation_date'])
     obs_date=None
     f0=math.nan
@@ -178,10 +176,9 @@ def check_air_wet_bulb(df, fields):
 
    
     
-# Detects outliers and flags them [1]
+# Detects outliers and flags them [1] and returns list of graph data
 def flag_outliers (df, field_id):
-
-
+    outliers_data=[]
     df_proc=df[df.field_id==field_id].sort_values(by=['observation_date'])
     
     #determine list of series that are eligible for validation based on rule: needs less than 5 days before or after with no data
@@ -203,9 +200,9 @@ def flag_outliers (df, field_id):
                 standard_deviation=delta.std()
                 outliers=df_proc[df_proc.index.isin(delta[delta.gt(config.temperature_outlier_std_factor*standard_deviation)].index)]
                 if outliers.size >0:
+                    ans_max=ans+config.temperature_outlier_std_factor*standard_deviation
+                    ans_min=ans-config.temperature_outlier_std_factor*standard_deviation
                     if config.temperature_plot_outliers == True:
-                        ans_max=ans+config.temperature_outlier_std_factor*standard_deviation
-                        ans_min=ans-config.temperature_outlier_std_factor*standard_deviation
                         fig, ax = plt.subplots(1, figsize = (20, 8))
                         fig.autofmt_xdate()
                         ax.plot(x, y, '.', color ='black', label ="data")
@@ -218,10 +215,37 @@ def flag_outliers (df, field_id):
                     #flag the outliers
                     for ind,outlier in outliers.iterrows():
                         df.at[ind,'flagged']=10
-                        
+                    # Build graph json data
+                    data="{\"data\":["
+                    first_data=True
+                    for ind in x.keys():
+                        if first_data==False:
+                            data=data+","
+                        first_data=False
+                        data=data+"{\"x\":\""+str(x[ind])+"\","
+                        data=data+"\"y\":"+str(y[ind])+","
+                        data=data+"\"ly\":"
+                        if pd.isna(ans_min[ind]):
+                            data=data+"null"
+                        else:
+                            data=data+str(ans_min[ind])
+                        data=data+",\"uy\":"
+                        if pd.isna(ans_max[ind]):
+                            data=data+"null"
+                        else:
+                            data=data+str(ans_max[ind])
+                        data=data+",\"outlier\":"
+                        if ind in outliers:
+                            data=data+str(outliers[ind])
+                        else:
+                            data=data+"null"
+                        data=data+"}"
+                    data=data+"]}"
+                    outliers_data.append((field_id,data))
             obs_date=row['observation_date']
             list_partial=[]
             list_partial.append(row)
+    return outliers_data
 
 
 
@@ -231,11 +255,11 @@ def phase_2(entries,debug=False):
     
     def logPerf(tic,message):
         toc = time.perf_counter()
-        print(message, end='')
-        print (f":  {toc - tic:0.4f} seconds")
+        p.log(message, end='')
+        p.log (f":  {toc - tic:0.4f} seconds")
         return toc
     
-    print ("Starting temperature phase 2")
+    p.log ("Starting temperature phase 2")
     tic = time.perf_counter()
     # execute post process id3 on the whole dataset, not one entry at a time
     df=pd.DataFrame(entries, 
@@ -271,7 +295,7 @@ def phase_2(entries,debug=False):
         try:
             check_field_is_min_over_period(df_temp_nona, fields[0], fields[1])
         except:
-            print(df_temp_nona, fields[0], fields[1])
+            p.log(df_temp_nona, fields[0], fields[1])
     tic=logPerf(tic, "Completed field is minimum of other fields over period of time")
     
     # check temperature is the max of other values within past 24 hours max
@@ -298,12 +322,14 @@ def phase_2(entries,debug=False):
     tic=logPerf(tic, "Completed removing detected errors before outlier detection")
     
     # get series of values for a given field ID
+    outliers_graph=[]
     for field in config.temperature_stat_outliers:
-        flag_outliers(df_temp_cleaned, field)
+        outliers_graph.append(flag_outliers(df_temp_cleaned, field))
     tic=logPerf(tic, "Completed outlier detection")
 
 
     # fit the series
     df_temp_cleaned.to_sql('data_entries_corrected_final', db.engine, if_exists='append', index=False)
+    return outliers_graph
 
     
