@@ -1,0 +1,6 @@
+##### Required packages for the draw python code
+mysql-connector-python
+sqlalchemy
+matplotlib
+Numpy
+pandas

@@ -5,53 +5,60 @@ import phase1_methods as methods
 
 # assigning post-process ID's to field ID's
 # assign a TUPLE to multiple field_id's with one PPID; otherwise assign integer for single field_id
+# 1: pressure(in_hg), 2: vapour pressure(in_Hg), 3:temperature (F), 4: precipitation (in), 5: direction, 6: velocity (miles), 7: weather, 8: cloud type, 9:time, 10: RH (%), 11: cloud cover (tenths), 12 :various (character)
 ppid_to_field_id = {1: (4, 6, 7, 8, 67, 69),
                     2: 14,
-                    3: (5,9,10,11,12,13,36,37,38,39,63,64,68,76,77,78,79),
-                    4: (25, 26, 27, 28, 29, 30, 31, 50, 70, 71),
-                    5: (16, 17, 22, 23, 24, 53, 54),
-                    6: (19, 20, 21, 34, 35, 48, 61, 85),
-                    7: (18, 40, 41, 44, 51, 52, 56, 57, 66, 80, 82, 83)}
+                    3: (5, 9, 10, 11, 12, 13, 33, 36, 37, 38, 39, 62, 63, 64, 68, 76, 77, 78, 79, 81),
+                    4: (27, 30, 31, 50),
+                    5: (17, 19, 23),
+                    6: (20),
+                    7: (18, 40, 41, 44, 51, 52, 56, 57, 66, 80, 82, 83),
+                    8: (16, 22, 53, 54),
+                    9: (25, 26, 28, 29, 46, 65, 70, 71),
+                    10: (15, 58, 59, 60, 72, 74, 75),
+                    11: (24),
+                    12: (21, 61, 42, 47, 66),
+                    13: (34, 35, 48)}
 
-sef_type_to_field_id ={ "atb": (5,68),
-                       "au": (47),
-                       "cl":(22,53),
-                       "cd":(23),
-                       "ch":(16,54),
-                       "dd":(19),
-                       "e":(14),
-                       "hd":(17),
-                       "mslp":(7),
-                       "nl":(24),
-                       "p": (4,67),
-                       "p_cor":(7,69),
-                       "pr":(27,31),
-                       "ptb":(25,28),
-                       "pte":(26,29),
-                       "rh":(15,58,59,73,75,60,72),
-                       "rrt":(66),
-                       "sd":(50),
-                       "rain_dur":(70),
-                       "snow_dur":(71),
-                       "ss":(65),
-                       "ta":9,
-                       "ta_cor":(10),
-                       "tb":(11),
-                       "tb_cor":(12),
-                       "td":(33),
-                       "TGn":(62,81),
-                       "Tn":(38,76),
-                       "Tn_cor":(37,77),
-                       "Tx":(36,78),
-                       "Tx_cor":(37,79),
-                       "Tsx":(63,64),
-                       "wf":(85),
-                       "w":(34,48,35),
-                       "ws":(20),
-                       "ww":(18,52,40,44,57,56,80,83),
-                       "w2":(51,41,82)
-                       }
-sef_type_to_unit={ "atb": "C",
+sef_type_to_field_id = {"atb": (5, 68),
+                        "au": (47),
+                        "cl": (22, 53),
+                        "cd": (23),
+                        "ch": (16, 54),
+                        "dd": (19),
+                        "e": (14),
+                        "hd": (17),
+                        "mslp": (7),
+                        "nl": (24),
+                        "p": (4, 67),
+                        "p_cor": (7, 69),
+                        "pr": (27, 31),
+                        "ptb": (25, 28),
+                        "pte": (26, 29),
+                        "rh": (15, 58, 59, 73, 75, 60, 72),
+                        "rrt": (66),
+                        "sd": (50),
+                        "rain_dur": (70),
+                        "snow_dur": (71),
+                        "ss": (65),
+                        "ta": (9),
+                        "ta_cor": (10),
+                        "tb": (11),
+                        "tb_cor": (12),
+                        "td": (33),
+                        "TGn": (62, 81),
+                        "Tn": (38, 76),
+                        "Tn_cor": (37, 77),
+                        "Tx": (36, 78),
+                        "Tx_cor": (37, 79),
+                        "Tsx": (63, 64),
+                        "wf": (85),
+                        "w": (34, 48, 35),
+                        "ws": (20),
+                        "ww": (18, 52, 40, 44, 57, 56, 80, 83),
+                        "w2": (51, 41, 82)
+                        }
+sef_type_to_unit={"atb": "C",
                        "au": "text",
                        "cl":"lct",
                        "cd":"dir",
@@ -166,23 +173,26 @@ pressure_max = 33.000
 
 temperature_min = -100.0
 temperature_max=  {
-    "5": 100, 
+    "5": 100,
     "9": 120,
     "10": 120,
-    "11": 110, 
+    "11": 110,
     "12": 110,
     "13": 110,
+    "33": 130,
     "36": 130,
     "37": 130,
     "38": 100,
     "39": 100,
+    "62": 130,
     "63": 160,
     "64": 160,
     "68": 100,
     "76": 100,
     "77": 100,
     "78": 130,
-    "79": 130
+    "79": 130,
+    "81": 130
 }
 
 
@@ -203,7 +213,7 @@ temperature_air_wet_bulb_threshold=15
 temperature_air_wet_bulb=[[9,11,13],[10,12,13]] #same observation time: abs(abs(field[0]-field[1])-abs(field[2]))<air_wet_bulb_threshold
 
 # temperature fields to detect stat outliers
-temperature_stat_outliers=[9,10] 
+temperature_stat_outliers=[9,10]
 
 #define whether to display or not graphs for outliers
 temperature_plot_outliers=False

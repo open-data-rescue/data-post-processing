@@ -74,7 +74,7 @@ def create_final_corrected_table(continue_flag):
 # creates 'data_entries_corrected_final_iso' table for post-phase 2 processed data iso transformation
 def create_final_corrected_table_iso(continue_flag):
     if continue_flag is False:
-        cursor.execute("DROP TABLE IF EXISTS data_entries_corrected_final_iso;")
+        cursor.execute("TRUNCATE TABLE data_entries_corrected_final_iso;")
         create_table = "CREATE TABLE data_entries_corrected_final_iso AS SELECT * FROM data_entries_corrected_final LIMIT 0;"
         cursor.execute(create_table)
 
@@ -96,7 +96,7 @@ def add_to_corrected_table(entry_id, value, user_id, page_id, field_id, field_ke
 def populate_corrected_table():
     sql_command = "INSERT INTO data_entries_corrected " \
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
-                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);" 
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     cursor.executemany(sql_command, corrected_table)
     db_conn.commit()
 
@@ -111,7 +111,7 @@ def add_to_final_corrected_table_iso(entry_id, value, user_id, page_id, field_id
 def populate_final_corrected_table_iso():
     sql_command = "INSERT INTO data_entries_corrected_final_iso " \
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
-                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);" 
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     cursor.executemany(sql_command, final_corrected_table_iso)
     db_conn.commit()
 
@@ -126,7 +126,7 @@ def add_to_final_corrected_table(entry_id, value, user_id, page_id, field_id, fi
 def populate_final_corrected_table():
     sql_command = "INSERT INTO data_entries_corrected_final " \
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
-                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);" 
+                  "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     cursor.executemany(sql_command, final_corrected_table)
     db_conn.commit()
 
@@ -149,20 +149,20 @@ def populate_error_edit_code(phase):
                   "(id, ORIGINAL_VALUE, CORRECTED_VALUE, error_code, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, additional_info) " \
                   "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);".format(phase)
 
-    if phase==1:        
+    if phase==1:
         cursor.executemany(sql_command, phase_1_errors)
     elif phase==2:
        # cursor.executemany(sql_command, phase_2_errors)
         #create data frame from phase 2 errors, instead of above
         #data frame.to_sql
-        df_temp=pd.DataFrame(phase_2_errors, 
+        df_temp=pd.DataFrame(phase_2_errors,
                         columns=[ 'id', 'ORIGINAL_VALUE', 'CORRECTED_VALUE', 'error_code', 'user_id', 'page_id', 'field_id', 'field_key', 'annotation_id', 'transcription_id', 'post_process_id', 'observation_date', 'additional_info'])
         df_temp.to_sql('data_entries_phase_2', db.engine, if_exists='append', index=False)
-    db_conn.commit()   
+    db_conn.commit()
 
-    
-    
-    
+
+
+
 # add reconciled observation entry to duplicateless table (after phase 1)
 def add_to_duplicateless_table(entry_id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged):
     global duplicateless
@@ -176,7 +176,7 @@ def populate_duplicateless_table():
                   "(id, value, user_id, page_id, field_id, field_key, annotation_id, transcription_id, post_process_id, observation_date, flagged) " \
                   "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     cursor.executemany(sql_command, duplicateless)
-    db_conn.commit()   
+    db_conn.commit()
 
 # updates duplicateless table - used to update MySQL table during observation reconciliation, before continuing with phase 2
 def update_duplicateless_table(value, entry_id):
