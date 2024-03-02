@@ -1,41 +1,32 @@
 import phase1_methods as methods
 import tables
-#  id 6 = velocity
-
-
+# id3 = distance (miles), eg distance wind has run
 def phase_1(entry):
+
+    return_list = list(entry)
+    value = entry[1]
     synonyms_empty = ('empty', 'illegible', 'retracted', 'emptyblank', 'blank')
 #    single_letters = ('S', 's', 'T', 't', 'N', 'n') #things I noticed that appear by themselves
     inaps = ('inappreciable', '?napp', 'napp', 'inap', 'inapp')
-    alphabet = 'abcdefghijklmnopqrstuvwxyz'
-    return_list = list(entry)
-    value = entry[1]
-    if value != None and value != '':  # in case non-empty value
+
+    if value != None and value != '':  # deal with non-empty entries
         value = value.lower()
-        value = value.replace(' ', '')
-        if value in synonyms_empty:  # only treat in case the data is purposely empty
-            return_list[1] = value
-            tables.add_to_corrected_table(*return_list, 0)
-            return None
-        else:
-            if value in inaps:  # to unify results
-                value = 'inapp'
+        if value in synonyms_empty:  # if value purposely left empty
                 return_list[1] = value
                 tables.add_to_corrected_table(*return_list, 0)
                 return None
-            else:
+        else:
+            if value in inaps:  # to unify values
+                value = 0
+                tables.add_to_corrected_table(*return_list, 0)
+                return None
+            else:  # general formatting
                 value = methods.remove_spaces(value, return_list)
                 value = methods.correct_double_decimals(value, return_list)
                 value = methods.remove_unexpected_characters(value, return_list)
                 value = methods.remove_negatives(value, return_list)
                 value = methods.remove_question(value, return_list)
-                value = value.replace('.', '')  # deal with double '.'
                 value = value.replace(";", ".")
-                for elements in value:  # my way to remove alphabetical characters
-                    if elements in alphabet:
-                        value = value.replace(elements, '')
-                    elif elements in alphabet.upper():
-                        value = value.replace(elements, '')
                 return_list[1] = value
                 try:
                     v=float(value)
@@ -44,7 +35,7 @@ def phase_1(entry):
                 except ValueError:
                     tables.add_error_edit_code(1, '024', value, return_list[1], return_list)
                 return None
-    elif value == None or value == '':  # deal with empty values
-        return_list[1]='empty'
+
+    elif value == None or value =='':  # deal with empty entries
         tables.add_to_corrected_table(*return_list, 0)
         return None

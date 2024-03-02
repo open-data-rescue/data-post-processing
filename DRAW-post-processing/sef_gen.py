@@ -35,7 +35,8 @@ def getPeriod(sef_type):
     
     
 def getFilename(sef_type,type_result_set):
-    filename=os.environ.get('DRAW_sef_folder')+os.sep+"McGill_DRAW_1491_"
+    # FileNotFoundError: [Errno 2] No such file or directory: 'SEF/McGill_DRAW_1491_1874-10_1934-5-atb.tsv'
+    filename=os.environ.get('DRAW_sef_folder', 'SEF')+os.sep+"McGill_DRAW_1491_"
     
     if len(type_result_set)>0:
         sorted_type_results=sorted(type_result_set)
@@ -108,7 +109,7 @@ def generateSEF(sef_type):
         f.write ("Lat\t45.5\n")
         f.write ("Lon\t-73.59\n")
         f.write ("Alt\t49\n")
-        f.write ("Source\McGill\n")
+        f.write ("Source\tMcGill\n")
         f.write ("Link\thttps://draw.geog.mcgill.ca/\n")
         f.write ("Vbl\t" + config.sef_type_to_unit[sef_type]+"\n")
         f.write ("Stat\t")

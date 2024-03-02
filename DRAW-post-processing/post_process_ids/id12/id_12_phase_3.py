@@ -1,6 +1,6 @@
 import tables
 import phase3_methods as methods
-# id 7 = weather fields
+# id 12 = character fields (type of wind, aurora class, etc)
 
 
 def phase_3(entry):

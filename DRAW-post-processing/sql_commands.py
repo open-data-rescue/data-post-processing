@@ -110,7 +110,7 @@ def ref_adjacent_fluctuations(entry, obs_datetime):
     field_id = entry[4]
     return phase_1_data_sql[:len(phase_1_data_sql) - 1] + " WHERE field_id = {} " \
                                                           "AND date(observation_date)='{}' order by observation_date asc;".format(field_id, str(obs_datetime)[:10])
-                                                          
+
 
 # retrieves relevant field_id's in ledger sheet, to calculate particular field_id based on other two elements, using equation 1, 2 oe 3 (PHASE 2)
 def equation_retrieve_row(entry, equation_num):

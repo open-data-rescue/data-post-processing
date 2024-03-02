@@ -1,15 +1,16 @@
 import tables
-import phase3_methods as methods
-#  id 6 = velocity
+# import phase3_methods as methods
+import lmrlib
+#  id2 = vapour pressure
 
 
+# transform to hPA
 def phase_3(entry):
     return_list = list(entry)
     value = entry[1]
     if value != '-999':
         try:
-            v=float(value)
-            value = '{:.2f}'.format((methods.vel_mph2mps(v)))
+            value = '{:.2f}'.format(lmrlib.baro_Eng_in2mb(value))
         except ValueError:
             value = entry[1]
         except TypeError:

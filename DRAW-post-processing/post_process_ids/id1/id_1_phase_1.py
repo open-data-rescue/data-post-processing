@@ -2,6 +2,7 @@
 
 import phase1_methods as methods
 import tables
+# id1 = pressure values
 
 
 def phase_1(entry):
@@ -24,13 +25,14 @@ def phase_1(entry):
         value = methods.correct_double_decimals(value, return_list)
         value = methods.remove_alphabetical_char(value, return_list)
         value = methods.remove_unexpected_characters(value, return_list)
+        value = methods.remove_negatives(value, return_list)
+        value = methods.remove_question(value, return_list)
 
         return_list[1] = value
 
         # checking again if pressure value is of form XX.XXX after simple clean-up methods
         if methods.desired_pressure_format(value):
             tables.add_to_corrected_table(*return_list, 0)
-
         # TODO : 'Illegible' entries (currently disregarded)
         # TODO : append error_code in corrected table to any value being passed to said table with value '1'
 
@@ -44,7 +46,7 @@ def phase_1(entry):
                 tables.add_error_edit_code(1, '015', original_value, value, return_list)
                 tables.add_to_corrected_table(*return_list, 0)
 
-            # checking and fixing accordingly if pressure value of form 0.XXX, 2.XXX, 3.XXX, or 9.XXX
+# checking and fixing accordingly if pressure value of form 0.XXX, 2.XXX, 3.XXX, or 9.XXX
             elif methods.float_decimal_index(value) == 1:
                 match int(value[0]):
                     case 2:
@@ -95,8 +97,6 @@ def phase_1(entry):
             else:
                 tables.add_error_edit_code(1, '001', value, '', return_list)
                 tables.add_to_corrected_table(*return_list, 1)
-
-
         elif len(value) == 6:
             # value of form XXXXXX:
             if value.isnumeric():
@@ -121,8 +121,6 @@ def phase_1(entry):
             else:
                 tables.add_error_edit_code(1, '001', value, '', return_list)
                 tables.add_to_corrected_table(*return_list, 1)
-
-
         elif len(value) == 4:
             # value of form XXXX
             if value.isnumeric():

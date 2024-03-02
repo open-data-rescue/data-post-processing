@@ -10,10 +10,12 @@ phase_1_errors=[]
 phase_2_errors=[]
 duplicateless=[]
 
+#
 db_user=os.environ.get('DRAW_local_db_user')
 db_passwd=os.environ.get('DRAW_local_db_pass')
 db_name=os.environ.get('DRAW_local_db_name')
-db_host=os.environ.get('DRAW_db_host')
+db_host=os.environ.get('DRAW_db_host',"127.0.0.1")
+db_port=os.environ.get('DRAW_db_port',"3306")
 
 # connection to copy of database on local machine
 conn = mysql.connector.connect(
@@ -21,12 +23,16 @@ conn = mysql.connector.connect(
     user=db_user,
     password=db_passwd,
     database=db_name,
-    host=db_host
+    host=db_host,
+    port=db_port
 )
 
 cursor = conn.cursor()
 
-url = "mysql+mysqlconnector://"+db_user+":"+db_passwd+"@"+db_host+"/"+db_name
+
+# Problem? dialect+driver://username:password@host:port/database
+url = "mysql+mysqlconnector://"+db_user+":"+db_passwd+"@"+db_host+":"+db_port+"/"+db_name
+
 engine = sqlalchemy.create_engine(url)
 
 
