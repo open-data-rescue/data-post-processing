@@ -1,5 +1,5 @@
 # data-post-processing
-code for post processing transcribed data
+code for post processing transcribed data from the McGill DRAW project
 
 
 This repository contains code was started in summer 2022 by Nathan Leuranger and Victoria Slonosky to post-process presssure data from the McGill DRAW
